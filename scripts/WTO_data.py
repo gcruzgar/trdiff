@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd 
 from datetime import datetime
+import matplotlib.pyplot as plt 
 
 # Load translation time data
 orig_df = pd.read_excel("data/Tableau_stats.xlsx") 
@@ -53,8 +54,23 @@ spanish["TRANSLATION DAYS"] = day_list
 
 # join time talen for each language into one df
 time_df = pd.concat([french["TRANSLATION DAYS"], spanish["TRANSLATION DAYS"]], axis=1, sort=False)
-time_df.columns = ["FRENCH DAYS", "SPANISH DAYS"]
+time_df.columns = ["DAYS FRENCH", "DAYS SPANISH"]
 
 # join with number of words in original document
 time_df = pd.concat([orig_df["WORDS"].iloc[2:], time_df], axis=1, sort=False)
+
+## plot time taken against number of words
+# plt.plot(time_df["WORDS"], time_df["DAYS FRENCH"], '.')
+# plt.plot(time_df["WORDS"], time_df["DAYS SPANISH"], '.')
+# plt.xlabel("Number of words")
+# plt.ylabel("Days taken to translate")
+# plt.legend()
+# plt.show()
+
+#plt.plot(time_df["FRENCH"], time_df["SPANISH"], '.')
+
+# Number of words translated per day (average)
+w_perday = pd.DataFrame()
+w_perday["PERDAY FRENCH"] = time_df["WORDS"].div(time_df["DAYS FRENCH"], axis=0)
+w_perday["PERDAY SPANISH"] = time_df["WORDS"].div(time_df["DAYS SPANISH"], axis=0)
 
