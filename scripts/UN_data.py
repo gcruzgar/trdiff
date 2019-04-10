@@ -11,7 +11,10 @@ from sklearn.model_selection import train_test_split
 reliable = pd.read_csv("data/timed-un/reliable.dat", sep=' ')
 reliable1_dim = pd.read_csv("data/timed-un/reliable1-dim.dat", sep='\t')
 
-# summary statistics
+""" 
+Summary statistics
+"""
+
 reliable.groupby(['category']).describe() #.mean()
 
 #plots
@@ -22,8 +25,18 @@ reliable.groupby(['category']).describe() #.mean()
 #     plt.plot(cat_df['words'], cat_df['days'], '.')
 # plt.show()
 
-# prepare data for linear regression
+""" 
+Data pre-processing
+"""
+
+# Join releveant data into one dataframe
 reg_df = pd.concat([reliable[['perday', 'words']], reliable1_dim], axis=1)
+
+# Convert categorical features into numerical labels
+enc = preprocessing.LabelEncoder()
+cat = reliable['category']
+enc.fit(cat)
+reg_df['category'] = enc.transform(cat)
 
 X = reg_df.iloc[:, 1:] # features
 y = reg_df.iloc[:, 0]  # objective
@@ -58,7 +71,7 @@ ols_residuals = y_test - y_pred
 ols.score(X_test_s, y_test)
 
 plt.scatter(y_test, y_pred)
-plt.plot(range(400,1800), range(400,1800), 'k-')
+plt.plot(range(400,2200), range(400,2200), 'k-')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
 plt.title('Ordinary Least Squares')
@@ -79,7 +92,7 @@ rreg.score(X_test_s, y_test)
 
 plt.figure()
 plt.scatter(y_test, y_pred)
-plt.plot(range(400,1800), range(400,1800), 'k-')
+plt.plot(range(400,2200), range(400,2200), 'k-')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
 plt.title("Ridge Regression")
@@ -99,7 +112,7 @@ lasso_residuals = y_test - y_pred
 
 plt.figure()
 plt.scatter(y_test, y_pred)
-plt.plot(range(400,2000), range(400,2000), 'k-')
+plt.plot(range(400,2200), range(400,2200), 'k-')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
 plt.title("Lasso")
