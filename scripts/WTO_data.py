@@ -14,7 +14,7 @@ french.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"
 spanish = orig_df.iloc[2:,8:-1].drop("TRANSLATION REVISION.1", axis=1)
 spanish.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"]
 
-# Change string to datetime + correct typos
+# Change string to datetime
 french["TRANSLATION END"].iloc[5] = datetime.strptime(french["TRANSLATION END"].iloc[5], '%d.%m.%Y')
 french["TRANSLATION START"].iloc[5] = datetime.strptime(french["TRANSLATION START"].iloc[5], '%d.%m.%Y')
 french["POOL END"].iloc[5] = datetime.strptime(french["POOL END"].iloc[5], '%d.%m.%Y')
@@ -25,6 +25,7 @@ spanish["TRANSLATION START"].iloc[5] = datetime.strptime(spanish["TRANSLATION ST
 spanish["POOL END"].iloc[5] = datetime.strptime(spanish["POOL END"].iloc[5], '%d.%m.%Y')
 spanish["POOL START"].iloc[5] = datetime.strptime(spanish["POOL START"].iloc[5], '%d.%m.%Y')
 
+# Correct typos
 spanish["TRANSLATION START"].iloc[95] = datetime(2018, 5, 23)
 
 # Time taken for translation (excluding weekends)
@@ -73,4 +74,15 @@ time_df = pd.concat([orig_df["WORDS"].iloc[2:], time_df], axis=1, sort=False)
 w_perday = pd.DataFrame()
 w_perday["PERDAY FRENCH"] = time_df["WORDS"].div(time_df["DAYS FRENCH"], axis=0)
 w_perday["PERDAY SPANISH"] = time_df["WORDS"].div(time_df["DAYS SPANISH"], axis=0)
+
+time_df = pd.concat([time_df, w_perday], axis=1, sort=False)
+
+job_df = orig_df[["JOB N°", "SYMBOL"]].iloc[2:]
+output_df = pd.concat([job_df, time_df], axis=1, sort=False)
+
+print(output_df.head().round(2))
+
+s = False
+if s == True:
+    output_df.to_csv("data/wto_timed.csv", index=False)
 
