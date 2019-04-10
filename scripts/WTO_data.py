@@ -27,6 +27,7 @@ spanish["POOL START"].iloc[5] = datetime.strptime(spanish["POOL START"].iloc[5],
 
 # Correct typos
 spanish["TRANSLATION START"].iloc[95] = datetime(2018, 5, 23)
+french["TRANSLATION END"].loc[14] = datetime(2017, 2, 8)
 
 # Time taken for translation (excluding weekends)
 def working_days(start, end):
