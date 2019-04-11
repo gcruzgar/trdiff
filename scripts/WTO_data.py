@@ -1,35 +1,11 @@
 #!/usr/bin/env python3
 
+import argparse
 import numpy as np
 import pandas as pd 
 from datetime import datetime
 import matplotlib.pyplot as plt 
 
-# Load translation time data
-orig_df = pd.read_excel("data/Tableau_stats.xlsx") 
-
-# Split columns for french and spanish translations + change column names
-french = orig_df.iloc[2:,3:8].drop("TRANSLATION REVISION", axis=1)
-french.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"]
-spanish = orig_df.iloc[2:,8:-1].drop("TRANSLATION REVISION.1", axis=1)
-spanish.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"]
-
-# Change string to datetime
-french["TRANSLATION END"].iloc[5] = datetime.strptime(french["TRANSLATION END"].iloc[5], '%d.%m.%Y')
-french["TRANSLATION START"].iloc[5] = datetime.strptime(french["TRANSLATION START"].iloc[5], '%d.%m.%Y')
-french["POOL END"].iloc[5] = datetime.strptime(french["POOL END"].iloc[5], '%d.%m.%Y')
-french["POOL START"].iloc[5] = datetime.strptime(french["POOL START"].iloc[5], '%d.%m.%Y')
-
-spanish["TRANSLATION END"].iloc[5] = datetime.strptime(spanish["TRANSLATION END"].iloc[5], '%d.%m.%Y')
-spanish["TRANSLATION START"].iloc[5] = datetime.strptime(spanish["TRANSLATION START"].iloc[5], '%d.%m.%Y')
-spanish["POOL END"].iloc[5] = datetime.strptime(spanish["POOL END"].iloc[5], '%d.%m.%Y')
-spanish["POOL START"].iloc[5] = datetime.strptime(spanish["POOL START"].iloc[5], '%d.%m.%Y')
-
-# Correct typos
-spanish["TRANSLATION START"].iloc[95] = datetime(2018, 5, 23)
-french["TRANSLATION END"].loc[14] = datetime(2017, 2, 8)
-
-# Time taken for translation (excluding weekends)
 def working_days(start, end):
     """Output the number of working days between two given dates.
     Note: this assumes dates provided work on a Monday to Sunday basis.
@@ -40,50 +16,104 @@ def working_days(start, end):
 
     return days
 
-day_list = []
-for i in french.index:
-    days = working_days(french["TRANSLATION START"].loc[i], french["TRANSLATION END"].loc[i]) + 1 # +1 so that finishing on the same day it started counts as one day
-    day_list.append(days)
+def remove_outliers(time_df, n):
+    """ Only keep cases where the time taken is less than n times as long for one language compared to the other.
+    Also drop cases where the difference in days is larger than 8*n. (20 days for n=2.5)"""
 
-french["TRANSLATION DAYS"] = day_list
+    time_df = time_df.loc[(time_df["DAYS FRENCH"] / time_df["DAYS SPANISH"]) < n]
+    time_df = time_df.loc[(time_df["DAYS SPANISH"] / time_df["DAYS FRENCH"]) < n] 
+    time_df = time_df.loc[abs(time_df["DAYS FRENCH"] - time_df["DAYS SPANISH"]) < 8*n]
 
-day_list = []
-for i in spanish.index:
-    days = working_days(spanish["TRANSLATION START"].loc[i], spanish["TRANSLATION END"].loc[i]) + 1 # +1 so that finishing on the same day it started counts as one day
-    day_list.append(days)
+    return time_df
 
-spanish["TRANSLATION DAYS"] = day_list
+def main():
 
-# join time talen for each language into one df
-time_df = pd.concat([french["TRANSLATION DAYS"], spanish["TRANSLATION DAYS"]], axis=1, sort=False)
-time_df.columns = ["DAYS FRENCH", "DAYS SPANISH"]
+    # Load translation time data
+    orig_df = pd.read_excel("data/Tableau_stats.xlsx") 
 
-# join with number of words in original document
-time_df = pd.concat([orig_df["WORDS"].iloc[2:], time_df], axis=1, sort=False)
+    # Split columns for french and spanish translations + change column names
+    french = orig_df.iloc[2:,3:8].drop("TRANSLATION REVISION", axis=1)
+    french.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"]
+    spanish = orig_df.iloc[2:,8:-1].drop("TRANSLATION REVISION.1", axis=1)
+    spanish.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"]
 
-## plot time taken against number of words
-# plt.plot(time_df["WORDS"], time_df["DAYS FRENCH"], '.')
-# plt.plot(time_df["WORDS"], time_df["DAYS SPANISH"], '.')
-# plt.xlabel("Number of words")
-# plt.ylabel("Days taken to translate")
-# plt.legend()
-# plt.show()
+    # Change string to datetime
+    french["TRANSLATION END"].iloc[5] = datetime.strptime(french["TRANSLATION END"].iloc[5], '%d.%m.%Y')
+    french["TRANSLATION START"].iloc[5] = datetime.strptime(french["TRANSLATION START"].iloc[5], '%d.%m.%Y')
+    french["POOL END"].iloc[5] = datetime.strptime(french["POOL END"].iloc[5], '%d.%m.%Y')
+    french["POOL START"].iloc[5] = datetime.strptime(french["POOL START"].iloc[5], '%d.%m.%Y')
 
-#plt.plot(time_df["FRENCH"], time_df["SPANISH"], '.')
+    spanish["TRANSLATION END"].iloc[5] = datetime.strptime(spanish["TRANSLATION END"].iloc[5], '%d.%m.%Y')
+    spanish["TRANSLATION START"].iloc[5] = datetime.strptime(spanish["TRANSLATION START"].iloc[5], '%d.%m.%Y')
+    spanish["POOL END"].iloc[5] = datetime.strptime(spanish["POOL END"].iloc[5], '%d.%m.%Y')
+    spanish["POOL START"].iloc[5] = datetime.strptime(spanish["POOL START"].iloc[5], '%d.%m.%Y')
 
-# Number of words translated per day (average)
-w_perday = pd.DataFrame()
-w_perday["PERDAY FRENCH"] = time_df["WORDS"].div(time_df["DAYS FRENCH"], axis=0)
-w_perday["PERDAY SPANISH"] = time_df["WORDS"].div(time_df["DAYS SPANISH"], axis=0)
+    # Correct typos
+    spanish["TRANSLATION START"].iloc[95] = datetime(2018, 5, 23)
+    french["TRANSLATION END"].loc[14] = datetime(2017, 2, 8)
 
-time_df = pd.concat([time_df, w_perday], axis=1, sort=False)
+    # Time taken for translation (excluding weekends)
+    day_list = []
+    for i in french.index:
+        days = working_days(french["TRANSLATION START"].loc[i], french["TRANSLATION END"].loc[i]) + 1 # +1 so that finishing on the same day it started counts as one day
+        day_list.append(days)
 
-job_df = orig_df[["JOB N°", "SYMBOL"]].iloc[2:]
-output_df = pd.concat([job_df, time_df], axis=1, sort=False)
+    french["TRANSLATION DAYS"] = day_list
 
-print(output_df.head().round(2))
+    day_list = []
+    for i in spanish.index:
+        days = working_days(spanish["TRANSLATION START"].loc[i], spanish["TRANSLATION END"].loc[i]) + 1 # +1 so that finishing on the same day it started counts as one day
+        day_list.append(days)
 
-s = False
-if s == True:
-    output_df.to_csv("data/wto_timed.csv", index=False)
+    spanish["TRANSLATION DAYS"] = day_list
 
+    # join time talen for each language into one df
+    time_df = pd.concat([french["TRANSLATION DAYS"], spanish["TRANSLATION DAYS"]], axis=1, sort=False)
+    time_df.columns = ["DAYS FRENCH", "DAYS SPANISH"]
+
+    # join with number of words in original document
+    time_df = pd.concat([orig_df["WORDS"].iloc[2:], time_df], axis=1, sort=False)
+
+    # get rid of outliers (difference between french and spanish unusually large)
+    time_df = remove_outliers(time_df, args.n)
+
+    ## plot time taken against number of words
+    # plt.plot(time_df["WORDS"], time_df["DAYS FRENCH"], '.')
+    # plt.plot(time_df["WORDS"], time_df["DAYS SPANISH"], '.')
+    # plt.xlabel("Number of words")
+    # plt.ylabel("Days taken to translate")
+    # plt.legend()
+    # plt.show()
+
+    #plt.plot(time_df["FRENCH"], time_df["SPANISH"], '.')
+
+    # Number of words translated per day (average)
+    w_perday = pd.DataFrame()
+    w_perday["PERDAY FRENCH"] = time_df["WORDS"].div(time_df["DAYS FRENCH"], axis=0)
+    w_perday["PERDAY SPANISH"] = time_df["WORDS"].div(time_df["DAYS SPANISH"], axis=0)
+
+    time_df = pd.concat([time_df, w_perday], axis=1, sort=False)
+
+    job_df = orig_df[["JOB N°", "SYMBOL"]].iloc[2:]
+    output_df = pd.concat([job_df, time_df], axis=1, sort=False).dropna(how='any')
+
+    print(output_df.head(10).round(2))
+
+    if args.s:
+        output_path = args.op
+        if output_path.endswith((".csv", ".txt", ".data")): 
+            output_df.to_csv(output_path, index=False)
+            print("\nOutput saved to %s" % output_path)
+        else:
+            print("\nOutput path must include filename. \nNote: output will be saved as comma separated values.")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", action="store_true",
+        help="Save output to csv.")
+    parser.add_argument("-n", type=float, default=2.5,
+        help="Difference factor for outliers. Small values mean more points are considered outliers.")
+    parser.add_argument("-op", type=str, default="data/wto_timed.csv",
+        help="Path for output file, including filename.")
+    args = parser.parse_args()    
+    main()
