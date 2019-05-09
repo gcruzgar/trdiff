@@ -1,0 +1,15 @@
+# Extracting text from docx using regex
+
+# Preserve formatting:
+
+find . -name "*.docx" | while read file; do
+    unzip -p $file word/document.xml |
+        sed -e 's/<\/w:p>/\n/g; s/<[^>]\{1,\}>//g; s/[^[:print:]\n]\{1,\}//g' > "${file/docx/txt}"
+done
+
+# One line text:
+
+find . -name "*.docx" | while read file; do
+    unzip -p $file word/document.xml |
+        sed -e 's/<[^>]\{1,\}>//g; s/[^[:print:]]\{1,\}//g' > "${file/docx/txt}"
+done
