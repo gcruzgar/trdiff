@@ -15,10 +15,15 @@ find . -name "*.docx" | while read file; do
             tr '\n' ' ' | tr -s ' ' > "${file/docx/txt}" 
 done
 
-# (3) Append all texts to one file:
+# (3) add new line to end of document:
+for filename in *.txt; do
+    echo "" >> "$filename"
+done
+
+# (4) Append all texts to one file:
 cat *.txt >> corpus.ol
 
-# (4) Biber Multidimensional Analysis:
+# (5) Biber Multidimensional Analysis:
 python3 biber-dim.py -l en -t corpus.ol > brown.dat
 #####################################################################################
 
