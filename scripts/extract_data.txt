@@ -1,15 +1,77 @@
 # Extracting text from docx using regex
 
-# Preserve formatting:
+#####################################################################################
+## Final:
 
+#(1) Extract text from .doc preserving format and convert new lines to single spaces:
+find . -name "*.doc" | while read file; do
+    catdoc $file | tr '\n' ' ' | tr -s ' ' > "${file/doc/txt}"
+done
+
+# (2) Extract text from .docx preserving format and then convert new lines to spaces:
+find . -name "*.docx" | while read file; do 
+    unzip -p $file word/document.xml | 
+        sed -e 's/<\/w:p>/\n/g; s/<[^>]\{1,\}>//g; s/[^[:print:]\n]\{1,\}//g' | 
+            tr '\n' ' ' | tr -s ' ' > "${file/docx/txt}" 
+done
+
+# (3) Append all texts to one file:
+cat *.txt >> corpus.ol
+
+# (4) Biber Multidimensional Analysis:
+python3 biber-dim.py -l en -t corpus.ol > brown.dat
+#####################################################################################
+
+# Preserve formatting:
 find . -name "*.docx" | while read file; do
     unzip -p $file word/document.xml |
         sed -e 's/<\/w:p>/\n/g; s/<[^>]\{1,\}>//g; s/[^[:print:]\n]\{1,\}//g' > "${file/docx/txt}"
 done
 
 # One line text:
-
 find . -name "*.docx" | while read file; do
     unzip -p $file word/document.xml |
         sed -e 's/<[^>]\{1,\}>//g; s/[^[:print:]]\{1,\}//g' > "${file/docx/txt}"
 done
+
+# Using packages:
+catdoc foo.doc > foo.txt
+docx2txt foo.docx
+
+# change new line to space:
+tr '\n' ' '
+
+# compress multiple consecutive spaces into single spaces
+tr -s ' '
+
+# Remove non-ascii characters:
+iconv -c -f utf-8 -t ascii foo.txt > foo.txt
+
+## AUTOMITASION - regex
+# (1) Extract text preserving format and then convert new lines to spaces:
+find . -name "*.docx" | while read file; do 
+    unzip -p $file word/document.xml | 
+        sed -e 's/<\/w:p>/\n/g; s/<[^>]\{1,\}>//g; s/[^[:print:]\n]\{1,\}//g' | 
+            tr '\n' ' ' | tr -s ' ' > "${file/docx/txt}" 
+done
+
+# (2) Append all texts to one file:
+cat *.txt >> corpus.ol
+
+# (3) Biber Multidimensional Analysis:
+python3 biber-dim.py -l en -t corpus.ol > brown.dat
+
+## AUTOMITASION - installed packages
+#(1) Extract text preserving format and convert new lines to spaces:
+find . -name "*.doc" | while read file; do
+    catdoc $file | tr '\n' ' ' | tr -s ' ' > "${file/doc/txt}"
+done
+find . -name "*.docx" | while read file; do
+    docx2txt $file > "${file/docx/txt}"
+done
+
+# (2) Append all texts to one file:
+cat *.txt >> corpus.ol
+
+# (3) Biber Multidimensional Analysis:
+python3 biber-dim.py -l en -t corpus.ol > brown.dat
