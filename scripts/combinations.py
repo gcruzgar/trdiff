@@ -34,6 +34,14 @@ wto_df = wto_df.drop(columns=['JOB N°', 'SYMBOL', 'DAYS FRENCH', 'DAYS SPANISH'
 wto_df.rename(index=str, columns={"WORDS": "words", "PERDAY FRENCH": "perday"}, inplace=True)
 reg_df = pd.concat([un_df, wto_df], axis=0)
 
+# Drop columns with a large number of zeros:
+drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.3*reg_df.shape[1]]
+reg_df.drop(drop_cols, axis=1, inplace=True)
+
+# Drop outliers:
+r_98p = reg_df['perday'].quantile(q=0.98)
+reg_df = reg_df.loc[reg_df["perday"] < r_98p]
+
 # Preprocessing:
 X = reg_df.drop(columns=['perday']) # features
 y = reg_df['perday']  # objective
@@ -65,7 +73,7 @@ y_pred = ols.predict(X_test_s)
 ols_residuals = y_test - y_pred
 
 plt.scatter(y_test, y_pred)
-plt.plot(range(200,3000), range(200,3000), 'k-')
+plt.plot(range(100,3000), range(100,3000), 'k-')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
 plt.title('Ordinary Least Squares')
@@ -80,5 +88,5 @@ plt.title("OLS Residuals")
 plt.show()
 
 #print("Coefficients: \n{}".format(ols.coef_))
-ols.score(X_test_s, y_test)
 ols_residuals.describe()
+ols.score(X_test_s, y_test)
