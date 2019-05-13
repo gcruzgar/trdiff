@@ -15,7 +15,7 @@ reliable1_dim = pd.read_csv("data/timed-un/reliable1-dim.dat", sep='\t')
 Summary statistics
 """
 
-reliable.groupby(['category']).describe() #.mean()
+#reliable.groupby(['category']).describe() #.mean()
 
 #plots
 # for cat in set(reliable['category']):
@@ -37,6 +37,18 @@ enc = preprocessing.LabelEncoder()
 cat = reliable['category']
 enc.fit(cat)
 reg_df['category'] = enc.transform(cat)
+
+# Drop columns with a large number of zeros:
+#drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.5*reg_df.shape[1]]
+#reg_df.drop(drop_cols, axis=1, inplace=True)
+
+# Plots of each feature against words per day:
+# for i in range(2,reg_df.shape[1]):
+#     plt.figure()
+#     plt.scatter(reg_df['perday'], reg_df.iloc[:,i])
+#     plt.title(reg_df.columns[i])
+#     plt.xlabel("Words translated per day")
+# plt.show()
 
 X = reg_df.iloc[:, 1:] # features
 y = reg_df.iloc[:, 0]  # objective
