@@ -94,7 +94,7 @@ plt.show()
 
 #print("Coefficients: \n{}".format(ols.coef_))
 ols_residuals.describe()
-ols.score(X_test_s, y_test)
+print("r-score: %0.3f" % (ols.score(X_test_s, y_test)))
 
 # test_df = pd.DataFrame(data=X_test_s)
 # test_df['y'] = y_test.reset_index(drop=True)
