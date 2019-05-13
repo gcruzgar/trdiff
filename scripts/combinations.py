@@ -39,8 +39,12 @@ drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.3*reg_df.shape[1]]
 reg_df.drop(drop_cols, axis=1, inplace=True)
 
 # Drop outliers:
-r_98p = reg_df['perday'].quantile(q=0.98)
-reg_df = reg_df.loc[reg_df["perday"] < r_98p]
+drop_outliers = True
+if drop_outliers == True:
+    r_95p = reg_df['perday'].quantile(q=0.95)
+    #r_5p = reg_df['perday'].quantile(q=0.05)
+    reg_df = reg_df.loc[reg_df["perday"] < r_95p]
+    #reg_df = reg_df.loc[reg_df["perday"] > r_5p]
 
 # Preprocessing:
 X = reg_df.drop(columns=['perday']) # features
@@ -73,11 +77,12 @@ y_pred = ols.predict(X_test_s)
 ols_residuals = y_test - y_pred
 
 plt.scatter(y_test, y_pred)
-plt.plot(range(100,3000), range(100,3000), 'k-')
+plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y_test)), 'r--')
+plt.plot(range(100,2600), range(100,2600), 'k-')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
 plt.title('Ordinary Least Squares')
-plt.show()
+#plt.show()
 
 #Residuals
 plt.figure()
@@ -90,3 +95,9 @@ plt.show()
 #print("Coefficients: \n{}".format(ols.coef_))
 ols_residuals.describe()
 ols.score(X_test_s, y_test)
+
+# test_df = pd.DataFrame(data=X_test_s)
+# test_df['y'] = y_test.reset_index(drop=True)
+
+# test_df = test_df.loc[test_df['y'] < 3000]
+# ols.score(test_df.drop(columns=['y']), test_df['y'])
