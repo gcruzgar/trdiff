@@ -16,13 +16,26 @@ def working_days(start, end):
 
     return days
 
-def remove_outliers(time_df, n):
-    """ Only keep cases where the time taken is less than n times as long for one language compared to the other.
-    Also drop cases where the difference in days is larger than 8*n. (20 days for n=2.5)"""
+def remove_outliers(time_df, q):
+    """ 
+    New: Remove values outside q to (100-q) quantiles.
 
-    time_df = time_df.loc[(time_df["DAYS FRENCH"] / time_df["DAYS SPANISH"]) < n]
-    time_df = time_df.loc[(time_df["DAYS SPANISH"] / time_df["DAYS FRENCH"]) < n] 
-    time_df = time_df.loc[abs(time_df["DAYS FRENCH"] - time_df["DAYS SPANISH"]) < 8*n]
+    Old: Only keep cases where the time taken is less than n times as long for one language compared to the other.
+    Also drop cases where the difference in days is larger than 8*n. (20 days for n=2.5)
+    """
+    # old version
+    # # remove outliers based on ratio and minimum difference
+    # time_df = time_df.loc[(time_df["DAYS FRENCH"] / time_df["DAYS SPANISH"]) < n]
+    # time_df = time_df.loc[(time_df["DAYS SPANISH"] / time_df["DAYS FRENCH"]) < n] 
+    # time_df = time_df.loc[abs(time_df["DAYS FRENCH"] - time_df["DAYS SPANISH"]) < 8*n]
+
+    # remove outliers based on quantiles
+    perday_ratio = time_df['DAYS FRENCH'] / time_df['DAYS SPANISH']
+    uq = perday_ratio.quantile(q=(100-q)/100)
+    lq = perday_ratio.quantile(q=q/100)
+    perday_ratio = perday_ratio.loc[perday_ratio < uq]
+    perday_ratio = perday_ratio.loc[perday_ratio > lq]
+    time_df = time_df.loc[perday_ratio.index]
 
     return time_df
 
@@ -51,6 +64,10 @@ def main():
     # Correct typos
     spanish["TRANSLATION START"].iloc[95] = datetime(2018, 5, 23)
     french["TRANSLATION END"].loc[14] = datetime(2017, 2, 8)
+    
+    # Drop duplicate entries
+    spanish.drop_duplicates(inplace=True)
+    french.drop_duplicates(inplace=True)
 
     # Time taken for translation (excluding weekends)
     day_list = []
@@ -67,7 +84,7 @@ def main():
 
     spanish["TRANSLATION DAYS"] = day_list
 
-    # join time talen for each language into one df
+    # join time taken for each language into one df
     time_df = pd.concat([french["TRANSLATION DAYS"], spanish["TRANSLATION DAYS"]], axis=1, sort=False)
     time_df.columns = ["DAYS FRENCH", "DAYS SPANISH"]
 
@@ -75,7 +92,7 @@ def main():
     time_df = pd.concat([orig_df["WORDS"].iloc[2:], time_df], axis=1, sort=False)
 
     # get rid of outliers (difference between french and spanish unusually large)
-    time_df = remove_outliers(time_df, args.n)
+    time_df = remove_outliers(time_df, args.q)
 
     ## plot time taken against number of words
     # plt.plot(time_df["WORDS"], time_df["DAYS FRENCH"], '.')
@@ -111,8 +128,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", action="store_true",
         help="Save output to csv.")
-    parser.add_argument("-n", type=float, default=2.5,
-        help="Difference factor for outliers. Small values mean more points are considered outliers.")
+    parser.add_argument("-q", type=float, default=10,
+        help="Quantiles to remove (<q and >100-q).")
     parser.add_argument("-op", type=str, default="data/wto_timed.csv",
         help="Path for output file, including filename.")
     args = parser.parse_args()    
