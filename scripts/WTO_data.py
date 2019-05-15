@@ -44,30 +44,29 @@ def main():
     # Load translation time data
     orig_df = pd.read_excel("data/Tableau_stats.xlsx") 
 
+    # Drop duplicate entries
+    orig_df.drop_duplicates(subset=['JOB N°', 'SYMBOL', 'WORDS'],inplace=True)
+
     # Split columns for french and spanish translations + change column names
-    french = orig_df.iloc[2:,3:8].drop("TRANSLATION REVISION", axis=1)
+    french = orig_df.iloc[1:,3:8].drop("TRANSLATION REVISION", axis=1)
     french.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"]
-    spanish = orig_df.iloc[2:,8:-1].drop("TRANSLATION REVISION.1", axis=1)
+    spanish = orig_df.iloc[1:,8:-1].drop("TRANSLATION REVISION.1", axis=1)
     spanish.columns=["TRANSLATION START", "TRANSLATION END", "POOL START", "POOL END"]
 
-    # Change string to datetime
-    french["TRANSLATION END"].iloc[5] = datetime.strptime(french["TRANSLATION END"].iloc[5], '%d.%m.%Y')
-    french["TRANSLATION START"].iloc[5] = datetime.strptime(french["TRANSLATION START"].iloc[5], '%d.%m.%Y')
-    french["POOL END"].iloc[5] = datetime.strptime(french["POOL END"].iloc[5], '%d.%m.%Y')
-    french["POOL START"].iloc[5] = datetime.strptime(french["POOL START"].iloc[5], '%d.%m.%Y')
+    # Change string to datetime - UPDATE: no need after duplicates dropped
+    # french["TRANSLATION END"].iloc[5] = datetime.strptime(french["TRANSLATION END"].iloc[5], '%d.%m.%Y')
+    # french["TRANSLATION START"].iloc[5] = datetime.strptime(french["TRANSLATION START"].iloc[5], '%d.%m.%Y')
+    # french["POOL END"].iloc[5] = datetime.strptime(french["POOL END"].iloc[5], '%d.%m.%Y')
+    # french["POOL START"].iloc[5] = datetime.strptime(french["POOL START"].iloc[5], '%d.%m.%Y')
 
-    spanish["TRANSLATION END"].iloc[5] = datetime.strptime(spanish["TRANSLATION END"].iloc[5], '%d.%m.%Y')
-    spanish["TRANSLATION START"].iloc[5] = datetime.strptime(spanish["TRANSLATION START"].iloc[5], '%d.%m.%Y')
-    spanish["POOL END"].iloc[5] = datetime.strptime(spanish["POOL END"].iloc[5], '%d.%m.%Y')
-    spanish["POOL START"].iloc[5] = datetime.strptime(spanish["POOL START"].iloc[5], '%d.%m.%Y')
+    # spanish["TRANSLATION END"].iloc[5] = datetime.strptime(spanish["TRANSLATION END"].iloc[5], '%d.%m.%Y')
+    # spanish["TRANSLATION START"].iloc[5] = datetime.strptime(spanish["TRANSLATION START"].iloc[5], '%d.%m.%Y')
+    # spanish["POOL END"].iloc[5] = datetime.strptime(spanish["POOL END"].iloc[5], '%d.%m.%Y')
+    # spanish["POOL START"].iloc[5] = datetime.strptime(spanish["POOL START"].iloc[5], '%d.%m.%Y')
 
     # Correct typos
-    spanish["TRANSLATION START"].iloc[95] = datetime(2018, 5, 23)
+    spanish["TRANSLATION START"].loc[97] = datetime(2018, 5, 23)
     french["TRANSLATION END"].loc[14] = datetime(2017, 2, 8)
-    
-    # Drop duplicate entries
-    spanish.drop_duplicates(inplace=True)
-    french.drop_duplicates(inplace=True)
 
     # Time taken for translation (excluding weekends)
     day_list = []
