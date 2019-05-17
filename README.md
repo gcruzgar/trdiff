@@ -5,6 +5,7 @@ Can we modify or improve existing methods?
 Improve NLP methods by making alterations to input texts or by selecting how and when new examples are taught to the algorithm. 
 
 ### Things to try:
+
 - Linear regression using Biber dimensions (predicting words per day):
   + UN texts  [work started]
   + WTO texts [work started]
@@ -18,4 +19,22 @@ Improve NLP methods by making alterations to input texts or by selecting how and
   + Y. Yang et al 2019, "Improving Multilingual Sentence Embedding using Bi-directional Dual Encoder with Additive Margin Softmax"
   + K. Fan et al 2018, "Bilingial Expert Can Find Translation Errors"
   + D. Yogotama et al 2019, "Learning and Evaluating General Linguistic Intelligence"
+  + G. Kostopoulos et al 2018, "Semi-Supervised Regression: A recent review"
 - Visualisation of multidimensional data [Basic knowledge of this - would be interesting to see what we can do]
+
+## Biber Dimensions - words per day
+
+Biber dimensions (lexical, syntactic, tex-level... features in texts) can be used to build regression models predicting the rate of translation of documents (in words per day).
+
+See [biberpy](https://github.com/ssharoff/biberpy) for extraction of Biber dimensions in `python`. 
+
+The UNOG (around 200 documents) and WTO (around 100 documents) datasets contain metadata including time taken to translate each document. 
+
+Preliminary results using ordinary least squares regression show a weak correlation between biber dimensions and words translated per day. However, there is still large error in the predicted values and the residuals are not completly random error. This could be due to uncertainty in the data itself and other factors affecting the rate of translation that havent been accounted for. The results can be improved slightly by using the total number of words in the document and the category or topic of the document (e.g. which department of the UN) up to an r2-score = 0.43. Using other linear regression methods such as Ridge Regression and Lasso Regression offer very similar results.  
+
+![UN_OLS](img/un_wpd_ols.png)
+**Figure 1** Predicted against real values of words translated per day for the UNOG dataset (using biber dimensions and number of words in each document).
+
+![UN_OLS_Residuals](img/un_wpd_ols_residuals.png)
+**Figure 2** Difference in predicted and real values for the UNOG dataset. Note the appearance of a trend, possibly due to a systematic error or the increased unvertainty in documents that took to long (external reasons) or too short (lowest timeframe visible is one day).
+   
