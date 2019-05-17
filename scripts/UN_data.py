@@ -33,14 +33,18 @@ Data pre-processing
 reg_df = pd.concat([reliable[['perday', 'words']], reliable1_dim], axis=1)
 
 # Convert categorical features into numerical labels
-enc = preprocessing.LabelEncoder()
-cat = reliable['category']
-enc.fit(cat)
-reg_df['category'] = enc.transform(cat)
+use_cat = False
+if use_cat == True:
+    enc = preprocessing.LabelEncoder()
+    cat = reliable['category']
+    enc.fit(cat)
+    reg_df['category'] = enc.transform(cat)
 
 # Drop columns with a large number of zeros:
-#drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.5*reg_df.shape[1]]
-#reg_df.drop(drop_cols, axis=1, inplace=True)
+drop_zero_cols = False
+if drop_zero_cols == True:
+    drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.5*reg_df.shape[1]]
+    reg_df.drop(drop_cols, axis=1, inplace=True)
 
 # Plots of each feature against words per day:
 # for i in range(2,reg_df.shape[1]):
