@@ -8,13 +8,26 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
-def remove_outliers(time_df, n):
-    """ Only keep cases where the time taken is less than n times as long for one language compared to the other.
-    Also drop cases where the difference in days is larger than 8*n. (20 days for n=2.5)"""
+def remove_outliers(time_df, q):
+    """ 
+    New: Remove values outside q to (100-q) quantiles.
 
-    time_df = time_df.loc[(time_df["DAYS FRENCH"] / time_df["DAYS SPANISH"]) < n]
-    time_df = time_df.loc[(time_df["DAYS SPANISH"] / time_df["DAYS FRENCH"]) < n] 
-    time_df = time_df.loc[abs(time_df["DAYS FRENCH"] - time_df["DAYS SPANISH"]) < 8*n]
+    Old: Only keep cases where the time taken is less than n times as long for one language compared to the other.
+    Also drop cases where the difference in days is larger than 8*n. (20 days for n=2.5)
+    """
+    # old version
+    # # remove outliers based on ratio and minimum difference
+    # time_df = time_df.loc[(time_df["DAYS FRENCH"] / time_df["DAYS SPANISH"]) < n]
+    # time_df = time_df.loc[(time_df["DAYS SPANISH"] / time_df["DAYS FRENCH"]) < n] 
+    # time_df = time_df.loc[abs(time_df["DAYS FRENCH"] - time_df["DAYS SPANISH"]) < 8*n]
+
+    # remove outliers based on quantiles
+    perday_ratio = time_df['DAYS FRENCH'] / time_df['DAYS SPANISH']
+    uq = perday_ratio.quantile(q=(100-q)/100)
+    lq = perday_ratio.quantile(q=q/100)
+    perday_ratio = perday_ratio.loc[perday_ratio < uq]
+    perday_ratio = perday_ratio.loc[perday_ratio > lq]
+    time_df = time_df.loc[perday_ratio.index]
 
     return time_df
 
@@ -27,7 +40,7 @@ un_df = pd.concat([un_tr[['words', 'perday']], un_dim], axis=1)
 wto_tr = pd.read_csv("data/wto_edited.csv") 
 wto_dim = pd.read_csv("data/biber_wto.dat", sep='\t')  
 wto_df = pd.concat([wto_tr, wto_dim], axis=1)
-wto_df = remove_outliers(wto_df, n=2.5) 
+wto_df = remove_outliers(wto_df,q=5) 
 wto_df = wto_df.drop(columns=['JOB N°', 'SYMBOL', 'DAYS FRENCH', 'DAYS SPANISH', 'PERDAY SPANISH'])
 
 # Combine datasets:
@@ -35,16 +48,18 @@ wto_df.rename(index=str, columns={"WORDS": "words", "PERDAY FRENCH": "perday"}, 
 reg_df = pd.concat([un_df, wto_df], axis=0)
 
 # Drop columns with a large number of zeros:
-drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.3*reg_df.shape[1]]
-reg_df.drop(drop_cols, axis=1, inplace=True)
+drop_zero_cols = False
+if drop_zero_cols == True:
+    drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.3*reg_df.shape[1]]
+    reg_df.drop(drop_cols, axis=1, inplace=True)
 
 # Drop outliers:
 drop_outliers = True
 if drop_outliers == True:
     r_95p = reg_df['perday'].quantile(q=0.95)
-    #r_5p = reg_df['perday'].quantile(q=0.05)
+    r_5p = reg_df['perday'].quantile(q=0.05)
     reg_df = reg_df.loc[reg_df["perday"] < r_95p]
-    #reg_df = reg_df.loc[reg_df["perday"] > r_5p]
+    reg_df = reg_df.loc[reg_df["perday"] > r_5p]
 
 # Preprocessing:
 X = reg_df.drop(columns=['perday']) # features
@@ -81,7 +96,7 @@ plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y
 plt.plot(range(100,2600), range(100,2600), 'k-')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
-plt.title('Ordinary Least Squares')
+plt.title('OLS - UNOG & WTO')
 #plt.show()
 
 #Residuals
@@ -89,7 +104,7 @@ plt.figure()
 plt.plot(y_test, ols_residuals, '.')
 plt.xlabel("Real value")
 plt.ylabel("Residual")
-plt.title("OLS Residuals")
+plt.title("OLS Residuals - UNOG & WTO")
 plt.show()
 
 #print("Coefficients: \n{}".format(ols.coef_))
