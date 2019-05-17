@@ -32,9 +32,13 @@ The UNOG (around 200 documents) and WTO (around 100 documents) datasets contain 
 
 Preliminary results using ordinary least squares regression show a weak correlation between biber dimensions and words translated per day. However, there is still large error in the predicted values and the residuals are not completly random error. This could be due to uncertainty in the data itself and other factors affecting the rate of translation that havent been accounted for. The results can be improved slightly by using the total number of words in the document and the category or topic of the document (e.g. which department of the UN) up to an r2-score = 0.43. Using other linear regression methods such as Ridge Regression and Lasso Regression offer very similar results.  
 
-![UN_OLS](img/un_wpd_ols.png)
+![UN_OLS](img/un_wpd_ols.png)    
 **Figure 1** Predicted against real values of words translated per day for the UNOG dataset (using biber dimensions and number of words in each document).
 
-![UN_OLS_Residuals](img/un_wpd_ols_residuals.png)
-**Figure 2** Difference in predicted and real values for the UNOG dataset. Note the appearance of a trend, possibly due to a systematic error or the increased unvertainty in documents that took to long (external reasons) or too short (lowest timeframe visible is one day).
-   
+![UN_OLS_Residuals](img/un_wpd_ols_residuals.png)    
+**Figure 2** Difference in predicted and real values for the UNOG dataset. Note the appearance of a trend, possibly due to a systematic error or the increased uncertainty in documents that took to long (external reasons) or too short (lowest timeframe visible is one day).
+
+## Semi-Supervised Regression
+Due to the limit in labeled data (currently have access to ~300 documents) and the easier access to unlabeled data, semi-supervised regression is a good candidate for improved regression models.
+
+The general idea is to use labeled data to predict unlabeled data, accept the results above a confidence threshold, using these new labels to predict the remaining unlabeled data and so on and so forth. For example, the labeled UNOG dataset could be combined with the larger unlabeled UN corpus to predict the words translated per day, ultimately linked with text difficulty. 
