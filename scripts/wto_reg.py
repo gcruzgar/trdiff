@@ -31,7 +31,7 @@ def remove_outliers(time_df, q):
     return time_df
 
 features = pd.read_csv("data/biber_wto.dat", sep='\t')
-tr = pd.read_csv("data/wto_edited.csv")
+tr = pd.read_csv("data/wto_timed.csv")
 
 df = pd.concat([features, tr], axis=1)
 df = remove_outliers(df, q=10)
@@ -190,7 +190,7 @@ Combine French and Spanish
 X_combined = pd.concat([X, X], axis=0, ignore_index=True)
 y_combined = pd.concat([y_fr, y_sp], axis=0, ignore_index=True)
 
-X_train, X_test, y_train, y_test = train_test_split(X_combined, y_combined, test_size=0.15, random_state=210) #set random_state for reproducibility
+X_train, X_test, y_train, y_test = train_test_split(X_combined, y_combined, test_size=0.20, random_state=210) #set random_state for reproducibility
 
 scaler = preprocessing.StandardScaler().fit(X_train)
 X_train_s = scaler.transform(X_train)
@@ -205,7 +205,7 @@ ols_residuals = y_test - y_pred
 
 plt.figure()
 plt.scatter(y_test, y_pred)
-plt.plot(range(100, 5000), range(100, 5000), 'k-')
+plt.plot(range(0, 6000), range(0, 6000), 'k-')
 plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y_test)), 'r--')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
