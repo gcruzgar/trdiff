@@ -37,7 +37,7 @@ un_dim = pd.read_csv("data/timed-un/reliable1-dim.dat", sep='\t')
 un_df = pd.concat([un_tr[['words', 'perday']], un_dim], axis=1)
 
 # Load and join WTO translation data (+ option to filter outliers)
-wto_tr = pd.read_csv("data/wto_edited.csv") 
+wto_tr = pd.read_csv("data/wto_timed.csv") 
 wto_dim = pd.read_csv("data/biber_wto.dat", sep='\t')  
 wto_df = pd.concat([wto_tr, wto_dim], axis=1)
 wto_df = remove_outliers(wto_df,q=5) 
@@ -93,7 +93,7 @@ ols_residuals = y_test - y_pred
 
 plt.scatter(y_test, y_pred)
 plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y_test)), 'r--')
-plt.plot(range(100,2600), range(100,2600), 'k-')
+plt.plot(range(100,2500), range(100,2500), 'k-')
 plt.xlabel('True values')
 plt.ylabel('Predicted values')
 plt.title('OLS - UNOG & WTO')
