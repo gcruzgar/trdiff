@@ -1,5 +1,4 @@
-# sed to change full stops to fullstop newline and sample text (A1):
-# sed 's/\./.\n\(A1\)/g' input.txt > output.txt
+#!/usr/bin/env python3
 
 # Open human translation
 filename1 = "data/en-fr-100.fr"
@@ -26,3 +25,23 @@ with open("ht.txt", 'w') as f:
 with open("mt.txt", 'w') as f:
     for item in mt_id:
         f.write("%s\n" % item)
+
+## regex preprocessing:
+# (1) change new line to space:
+# tr '\n' ' ' < input.txt > output.txt
+# (2) add new line after each sentence:
+# sed 's/[.!?;] */&\n/g' input.txt > output.txt
+# (3) get rid of new lines generated due to '...': 
+# sed 's/\.\n\.\n\./\.\.\./g'  ## DOESNT WORK!
+# sed '/^\./d' ## this removes fullstops on empty lines
+# (4) remove lines starting with number:
+# sed '/^[0-9]\+/d' 
+# (5) correct instances of new lines caused by acronyms:
+# sed 's/^[A-Z]\.\n/&\s/g' ## DOESNT WORK AS INTENDED
+# (6) add sentence serial number:
+# see python code
+# (7) compute translation edit rate: 
+# java -jar tercom.7.25.jar -N -n outputfilename -o pra -r ht.txt -h mt.txt
+
+# Faster steps 2-5 (obtained from stackexchange - use at own risk)
+# sed -e :1 -e 's/\([.?!]\)[[:blank:]]\{1,\}\([^[:blank:]]\)/\1\ \2/;t1'
