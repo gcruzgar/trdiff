@@ -15,7 +15,7 @@ with open(filename2, "r") as f:
 for i in range(0, len(ht)):
     ht[i] = re.sub("\S*[0-9]\S*", "", ht[i])
     mt[i] = re.sub("\S*[0-9]\S*", "", mt[i])
-    mt[i] = re.sub("\<unk\>", "", mt[i])
+    mt[i] = re.sub("(\(\s)?\<unk\>(\s\))?", "", mt[i])
 
 # Add serial number to the end of each sentence
 ht_id=[]
