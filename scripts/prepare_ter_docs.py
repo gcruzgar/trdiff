@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import re
 
 # Open human translation
 filename1 = "data/en-fr-100.fr"
@@ -10,12 +11,18 @@ filename2 = "data/en-fr-100.mt"
 with open(filename2, "r") as f:
     mt=f.readlines() 
 
-# Add full stop to each end of line and sentence serial number
+# Delete numbers (and any word containing them) and unknowns
+for i in range(0, len(ht)):
+    ht[i] = re.sub("\S*[0-9]\S*", "", ht[i])
+    mt[i] = re.sub("\S*[0-9]\S*", "", mt[i])
+    mt[i] = re.sub("\<unk\>", "", mt[i])
+
+# Add serial number to the end of each sentence
 ht_id=[]
 mt_id=[]
 for i in range(0, len(ht)):
-    ht_id.append(ht[i].replace("\n", ". (A-"+str(i)+")"))
-    mt_id.append(mt[i].replace("\n", ". (A-"+str(i)+")"))
+    ht_id.append(ht[i].replace("\n", " (A-"+str(i)+")"))
+    mt_id.append(mt[i].replace("\n", " (A-"+str(i)+")"))
 
 # Save outputs to new file
 with open("ht.txt", 'w') as f:
@@ -26,7 +33,8 @@ with open("mt.txt", 'w') as f:
     for item in mt_id:
         f.write("%s\n" % item)
 
-## regex preprocessing:
+
+## regex preprocessing using sed:
 # (1) change new line to space:
 # tr '\n' ' ' < input.txt > output.txt
 # (2) add new line after each sentence:
