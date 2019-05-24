@@ -14,7 +14,7 @@ def main():
     df = pd.DataFrame(data=ht, columns=['line']) # save as dataframe for ease
     df = df.loc[df['line'].str.contains("Score")] # only need lines containing scores
     # only need actual score:
-    df['line'] = df['line'].str.replace("Score: ", "", regex=False)
+    df['line'] = df['line'].str.replace("Score: ", "")
     df['line'] = df['line'].str.replace("\((.*?)\)\\n", "")
 
     df.rename(index=str,columns={'line': 'score'}, inplace=True)
