@@ -55,7 +55,7 @@ WTO data has the advantage of including translation times to both French and Spa
 It is interesting to note that if outliers are not removed from the combined dataset, the regression becomes quite accurate in the range 0-2500 words per day, however, it also produces significant outliers that throw the entire model off. Could be interesting to only use the model in this range and figure out what produces said outliers (several orders of magnitude wrong).
 
 Note: before extracting Biber dimensions, it is important to make sure there is one text per line and that there are no empty lines as this will cause biber-dim.py to fail. Each corpus may have it's particular solutions. For the large UN corpus:
-```python
+```bash
 $ python
 import re
 
