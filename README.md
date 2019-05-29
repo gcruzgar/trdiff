@@ -24,15 +24,15 @@ Improve NLP methods by making alterations to input texts or by selecting how and
 
 ### Work in progress:
 
--**1.** Correlation between Biber-dim and time taken to translate:
-    + UN-timed [done]
-    + WTO-timed [done]
--**2.** Correlation between Biber-dim and TER score:
-    + UN-parallel [wip]
-    + cross-validation
--**3.** Use ELMO / XLM to vectorise texts and correlate with TER score
--**4.** Use TER score to predict time taken or classify text difficulty
-    + Build classifiers + cross-validation
+-**1.** Correlation between Biber-dim and time taken to translate:    
+    + UN-timed [done]    
+    + WTO-timed [done]    
+-**2.** Correlation between Biber-dim and TER score:    
+    + UN-parallel [wip]    
+    + cross-validation    
+-**3.** Use ELMO / XLM to vectorise texts and correlate with TER score    
+-**4.** Use TER score to predict time taken or classify text difficulty    
+    + Build classifiers + cross-validation    
 
 ## Biber Dimensions - words per day
 
