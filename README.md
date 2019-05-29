@@ -56,8 +56,11 @@ It is interesting to note that if outliers are not removed from the combined dat
 
 Note: before extracting Biber dimensions, it is important to make sure there is one text per line and that there are no empty lines as this will cause biber-dim.py to fail. Each corpus may have it's particular solutions. For the large UN corpus:
 ```python
+$ python
+import re
+
 for item in doc:
-    x = re.sub("^\s*\.\s*$", "", item) # remove lines only containing a full stop.
+    x = re.sub("^\s*[\.\-]\s*$", "", item) # remove lines only containing a full stop or a dash.
 ```
 ```bash
 $ sed '/^[[:space:]]*$/d' # remove empty lines (only spaces or tabs).
