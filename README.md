@@ -60,7 +60,7 @@ $ python
 import re
 
 for item in doc:
-    x = re.sub("^\s*[\.\-]\s*$", "", item) # remove lines only containing a full stop or a dash.
+    x = re.sub("^(\s*[\.\-]\s*)*$", "", item) # remove lines only containing full stop or dashes (can add * after [\.\-] to capture empty lines).
 ```
 ```bash
 $ sed '/^[[:space:]]*$/d' # remove empty lines (only spaces or tabs).
