@@ -9,7 +9,7 @@ Improve NLP methods by making alterations to input texts or by selecting how and
 - Linear regression using Biber dimensions (predicting words per day):
   + UN texts  [work started]
   + WTO texts [work started]
-- Prediction of MT errors and it's relation to text difficulty - domain adaptation [Need guidance but should be straight forward]
+- Prediction of MT errors and it's relation to text difficulty - domain adaptation [work started]
   + Build model and test on UN data to predict words per day
 - Test QEBrain - MT errors without reference
 - Semi-supervised approaches and NN: [Relatively new field - can learn basic NN and try some of these]
@@ -21,6 +21,18 @@ Improve NLP methods by making alterations to input texts or by selecting how and
   + D. Yogotama et al 2019, "Learning and Evaluating General Linguistic Intelligence"
   + G. Kostopoulos et al 2018, "Semi-Supervised Regression: A recent review"
 - Visualisation of multidimensional data [Basic knowledge of this - would be interesting to see what we can do]
+
+### Work in progress:
+
+-**1.** Correlation between Biber-dim and time taken to translate:
+    + UN-timed [done]
+    + WTO-timed [done]
+-**2.** Correlation between Biber-dim and TER score:
+    + UN-parallel [wip]
+    + cross-validation
+-**3.** Use ELMO / XLM to vectorise texts and correlate with TER score
+-**4.** Use TER score to predict time taken or classify text difficulty
+    + Build classifiers + cross-validation
 
 ## Biber Dimensions - words per day
 
