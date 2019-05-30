@@ -50,7 +50,7 @@ reg_df = pd.concat([un_df, wto_df], axis=0)
 # Drop columns with a large number of zeros:
 drop_zero_cols = False
 if drop_zero_cols == True:
-    drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.3*reg_df.shape[1]]
+    drop_cols = reg_df.columns[(reg_df == 0).sum() > 0.5*reg_df.shape[0]]
     reg_df.drop(drop_cols, axis=1, inplace=True)
 
 # Drop outliers:
