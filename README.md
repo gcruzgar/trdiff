@@ -7,10 +7,12 @@ Improve NLP methods by making alterations to input texts or by selecting how and
 ### Things to try:
 
 - Linear regression using Biber dimensions (predicting words per day):
-  + UN texts  [work started]
-  + WTO texts [work started]
-- Prediction of MT errors and it's relation to text difficulty - domain adaptation [work started]
-  + Build model and test on UN data to predict words per day
+  + UN texts  
+  + WTO texts 
+- Prediction of MT errors and it's relation to text difficulty - domain adaptation
+  + Predict TER using Biber dimensions
+  + Predict TER using XLM pretraining
+  + Build models and test on timed UN data to predict words per day
 - Test QEBrain - MT errors without reference
 - Semi-supervised approaches and NN: [Relatively new field - can learn basic NN and try some of these]
   + Curriculum learning - X. Zuang et al. 2018, "An Empirical Exploration of Curriculum Learning for Neural Machine Translation" 
@@ -28,9 +30,11 @@ Improve NLP methods by making alterations to input texts or by selecting how and
     + UN-timed [done]    
     + WTO-timed [done]    
 - **2.** Correlation between Biber-dim and TER score:    
-    + UN-parallel [wip]    
+    + UN-parallel [wip]
+        * Linear-Regression [wip]
+        * Support Vector Machine            
     + cross-validation    
-- **3.** Use ELMO / XLM to vectorise texts and correlate with TER score    
+- **3.** Use XLM to vectorise texts and correlate with TER score    
 - **4.** Use TER score to predict time taken or classify text difficulty    
     + Build classifiers + cross-validation    
 
