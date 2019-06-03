@@ -1,55 +1,33 @@
-#!/usr/bin/env python3
+#!/bin/env python3
 import re
 
 # Open human translation
-filename1 = "data/en-fr-100.fr"
+filename1 = "UNv1.0.6way.es"
 with open(filename1, "r") as f:
-    ht=f.readlines() 
+	es=f.readlines() 
 
 # Open machine translation
-filename2 = "data/en-fr-100.mt"
+filename2 = "UNv1.0.6way.en-es.mt"
 with open(filename2, "r") as f:
-    mt=f.readlines() 
+	mt=f.readlines() 
 
-# Delete numbers (and any word containing them) and unknowns
-for i in range(0, len(ht)):
-    ht[i] = re.sub("\S*[0-9]\S*", "", ht[i])
-    mt[i] = re.sub("\S*[0-9]\S*", "", mt[i])
-    mt[i] = re.sub("(\(\s)?\<unk\>(\s\))?", "", mt[i])
-
-# Add serial number to the end of each sentence
-ht_id=[]
-mt_id=[]
-for i in range(0, len(ht)):
-    ht_id.append(ht[i].replace("\n", " (A-"+str(i)+")"))
-    mt_id.append(mt[i].replace("\n", " (A-"+str(i)+")"))
+for i in range(0, len(es)):
+	# remove digits
+	es[i] = re.sub("\S*[0-9]\S*", "", es[i])
+	mt[i] = re.sub("\S*[0-9]\S*", "", mt[i])
+	
+	# remove unknowns    
+	mt[i] = re.sub("(\(\s)?\<unk\>(\s\))?", "", mt[i])
+	
+	# Add sentence number for TER score (not on original doc)
+	es[i] = es[i].replace("\n", " (A-"+str(i)+")")
+	mt[i] = mt[i].replace("\n", " (A-"+str(i)+")")
 
 # Save outputs to new file
-with open("ht.txt", 'w') as f:
-    for item in ht_id:
-        f.write("%s\n" % item)
+with open("es.txt", 'w') as f:
+	for item in es:
+		f.write("%s\n" % item)
 
 with open("mt.txt", 'w') as f:
-    for item in mt_id:
-        f.write("%s\n" % item)
-
-
-## regex preprocessing using sed:
-# (1) change new line to space:
-# tr '\n' ' ' < input.txt > output.txt
-# (2) add new line after each sentence:
-# sed 's/[.!?;] */&\n/g' input.txt > output.txt
-# (3) get rid of new lines generated due to '...': 
-# sed 's/\.\n\.\n\./\.\.\./g'  ## DOESNT WORK!
-# sed '/^\./d' ## this removes fullstops on empty lines
-# (4) remove lines starting with number:
-# sed '/^[0-9]\+/d' 
-# (5) correct instances of new lines caused by acronyms:
-# sed 's/^[A-Z]\.\n/&\s/g' ## DOESNT WORK AS INTENDED
-# (6) add sentence serial number:
-# see python code
-# (7) compute translation edit rate: 
-# java -jar tercom.7.25.jar -N -n outputfilename -o pra -r ht.txt -h mt.txt
-
-# Faster steps 2-5 (obtained from stackexchange - use at own risk)
-# sed -e :1 -e 's/\([.?!]\)[[:blank:]]\{1,\}\([^[:blank:]]\)/\1\ \2/;t1'
+	for item in mt:
+		f.write("%s\n" % item)
