@@ -7,6 +7,7 @@ from sklearn.svm import LinearSVR
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
+""" TER """
 features = pd.read_csv("data/en-fr-100.dim", sep='\t')
 ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\t', header=None)
 ter.columns=['Score']
@@ -22,6 +23,15 @@ if drop_outliers == True:
 
 X = df.drop(columns=['Score'])
 y = df['Score']
+
+
+# """ Words Translated Per Day """
+# reliable = pd.read_csv("data/timed-un/reliable.dat", sep=' ')
+# reliable1_dim = pd.read_csv("data/timed-un/reliable1-dim.dat", sep='\t')
+
+# df = pd.concat([reliable[['perday', 'words']], reliable1_dim], axis=1)
+# X = df.drop(columns=['perday']) # features
+# y = df['perday']  # objective
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=123) #set random_state for reproducibility
 
@@ -54,5 +64,5 @@ plt.ylabel("Residual")
 plt.title("LinearSVR Residuals")
 plt.show()
 
-#print("Coefficients: \n{}".format(ols.coef_))
+#print("Coefficients: \n{}".format(lsvr.coef_))
 print("\nr2-score: %0.4f" % lsvr.score(X_test_s, y_test))
