@@ -1,10 +1,33 @@
 # trdiff
 
-The overall objective is to understand what makes a text difficult to translate.
-Can we modify or improve existing methods? 
-Improve NLP methods by making alterations to input texts or by selecting how and when new examples are taught to the algorithm. 
+The overall objective is to understand what makes a text difficult to translate.  
+Can we predict which text are easier/harder to translate? (for human translation or machine translation)       
+Can we modify or improve existing methods?      
+Improve NLP methods by making alterations to input texts or by selecting how and when new examples are taught to the algorithm.     
 
-### Things to try:
+## Table of contents
+- **1.** [Work In Progress](#work-in-progress)    
+- **2.** [Initial Ideas](#initial-ideas)     
+- **3.** [Biber Dimensions](#biber-dimensions-\--words-per-day)    
+- **4.** [Translation Edit Rate](#translation-edit-rate)    
+- **5.** [Text Data Pre-Training](#text-data-pre\-training)    
+- **6.** [Semi-Supervised Regression](#semi\-supervised-regression)
+  
+### Work in progress:
+
+- **1.** Correlation between Biber-dim and time taken to translate:    
+    + UN-timed [done]    
+    + WTO-timed [done]    
+- **2.** Correlation between Biber-dim and TER score:    
+    + UN-parallel [wip]
+        * Linear-Regression [wip]
+        * Support Vector Machine [wip]            
+    + cross-validation    
+- **3.** Use XLM to vectorise texts and correlate with TER score [wip]    
+- **4.** Use TER score to predict time taken or classify text difficulty    
+    + Build classifiers + cross-validation 
+
+### Initial Ideas:
 
 - Linear regression using Biber dimensions (predicting words per day):
   + UN texts  
@@ -22,21 +45,7 @@ Improve NLP methods by making alterations to input texts or by selecting how and
   + K. Fan et al 2018, "Bilingial Expert Can Find Translation Errors"
   + D. Yogotama et al 2019, "Learning and Evaluating General Linguistic Intelligence"
   + G. Kostopoulos et al 2018, "Semi-Supervised Regression: A recent review"
-- Visualisation of multidimensional data [Basic knowledge of this - would be interesting to see what we can do]
-
-### Work in progress:
-
-- **1.** Correlation between Biber-dim and time taken to translate:    
-    + UN-timed [done]    
-    + WTO-timed [done]    
-- **2.** Correlation between Biber-dim and TER score:    
-    + UN-parallel [wip]
-        * Linear-Regression [wip]
-        * Support Vector Machine [wip]            
-    + cross-validation    
-- **3.** Use XLM to vectorise texts and correlate with TER score [wip]    
-- **4.** Use TER score to predict time taken or classify text difficulty    
-    + Build classifiers + cross-validation    
+- Visualisation of multidimensional data [Basic knowledge of this - would be interesting to see what we can do]   
 
 ## Biber Dimensions - words per day
 
@@ -74,9 +83,9 @@ Note that in order to compute TER, both a machine translation and a human refere
 It could be interesting to relate TER score with the Biber dimensions of the original text, to determine if any of these factors makes machine translation harder.
 Preliminary results show no correlation between TER and biber dimensions - OLS and SVR on large UN corpus.
 
-## Text data pre-training
+## Text Data Pre-Training
 See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
-See [ELMo](https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo.md) for tensorflow implementation of Deep contextualized word representations.     
+See [ELMo](https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo.md) for PyTorch/tensorflow implementation of Deep contextualized word representations.     
 
 The idea is to produce sentence embedding vectors which can be used for training. Once unlabelled text data is vectorised, it can be used to predict TER. Once a model is constructed, this can be used to predict words tranlsated per day and ultimately text difficulty.
 
