@@ -32,9 +32,9 @@ Improve NLP methods by making alterations to input texts or by selecting how and
 - **2.** Correlation between Biber-dim and TER score:    
     + UN-parallel [wip]
         * Linear-Regression [wip]
-        * Support Vector Machine            
+        * Support Vector Machine [wip]            
     + cross-validation    
-- **3.** Use XLM to vectorise texts and correlate with TER score    
+- **3.** Use XLM to vectorise texts and correlate with TER score [wip]    
 - **4.** Use TER score to predict time taken or classify text difficulty    
     + Build classifiers + cross-validation    
 
@@ -72,6 +72,13 @@ Computing the TER on a machine translation gives a score based on the minimum nu
 Note that in order to compute TER, both a machine translation and a human reference are required. See the [pre-processing](scripts/prepare_ter_docs.py) needed to compute TER for the UN corpus as an example. 
 
 It could be interesting to relate TER score with the Biber dimensions of the original text, to determine if any of these factors makes machine translation harder.
+Preliminary results show no correlation between TER and biber dimensions - OLS and SVR on large UN corpus.
+
+## Text data pre-training
+See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
+See [ELMo](https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo.md) for tensorflow implementation of Deep contextualized word representations.     
+
+The idea is to produce sentence embedding vectors which can be used for training. Once unlabelled text data is vectorised, it can be used to predict TER. Once a model is constructed, this can be used to predict words tranlsated per day and ultimately text difficulty.
 
 ## Semi-Supervised Regression
 Due to the limit in labeled data (currently have access to ~300 documents) and the easier access to unlabeled data, semi-supervised regression is a good candidate for improved regression models.
