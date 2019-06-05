@@ -43,3 +43,17 @@ def linear_regression(X, y, test_size=0.2, random_state=123):
     print("r2-score: %0.4f" % ols.score(X_test_s, y_test))
 
     return ols, scaler
+
+def remove_outliers(df, filter_var, lq=10, uq=None):
+""" 
+Remove values above upper quantile, uq, and below lower quantile, lq, from dataframe, df, based on column, filter_var.  
+"""
+    if uq == None:
+        uq = 100 - lq
+
+    r_uq = df[filter_var].quantile(q=uq)
+    r_lq = df[filter_var].quantile(q=lq)
+    df = df.loc[df[filter_var] < r_uq]
+    df = df.loc[df[filter_var] > r_lq]
+
+    return df
