@@ -47,6 +47,12 @@ Improve NLP methods by making alterations to input texts or by selecting how and
   + G. Kostopoulos et al 2018, "Semi-Supervised Regression: A recent review"
 - Visualisation of multidimensional data [Basic knowledge of this - would be interesting to see what we can do]   
 
+## Introduction
+As one would expect, the time it takes to translate a document is roughly proportional to the number of words it contains (see figure 1). However, there is great variance between documents. As the number and length of documents increases, it would be advantageous to determine what other factors contribute to the translation time and ultimately understand what makes a text hard to translate. This could also influence machine translation (MT) and give insight into the factors that negatively impact the quality of MT.   
+
+![UN_Words_PerDay](img/un_words_per_day.png)    
+**Figure 1** Time it took to translate a document against the length of the document in words for a set of United Nations public documents.
+
 ## Biber Dimensions - words per day
 
 Biber dimensions (lexical, syntactic, tex-level... features in texts) can be used to build regression models predicting the rate of translation of documents (in words per day).
@@ -58,10 +64,10 @@ The UNOG (around 200 documents) and WTO (around 100 documents) datasets contain 
 Preliminary results using ordinary least squares regression show a weak correlation between biber dimensions and words translated per day. However, there is still large error in the predicted values and the residuals are not completly random error. This could be due to uncertainty in the data itself and other factors affecting the rate of translation that havent been accounted for. The results can be improved slightly by using the total number of words in the document and the category or topic of the document (e.g. which department of the UN) up to an r2-score = 0.43. Using other linear regression methods such as Ridge Regression and Lasso Regression offer very similar results.  
 
 ![UN_OLS](img/un_wpd_ols.png)    
-**Figure 1** Predicted against real values of words translated per day for the UNOG dataset (using biber dimensions and number of words in each document).
+**Figure 2** Predicted against real values of words translated per day for the UNOG dataset (using biber dimensions and number of words in each document).
 
 ![UN_OLS_Residuals](img/un_wpd_ols_residuals.png)    
-**Figure 2** Difference in predicted and real values for the UNOG dataset. Note the appearance of a trend, possibly due to a systematic error or the increased uncertainty in documents that took to long (external reasons) or too short (lowest timeframe visible is one day).
+**Figure 3** Difference in predicted and real values for the UNOG dataset. Note the appearance of a trend, possibly due to a systematic error or the increased uncertainty in documents that took to long (external reasons) or too short (lowest timeframe visible is one day).
 
 WTO data has the advantage of including translation times to both French and Spanish, however, results with this dataset seem significantly worse. The uncertainty in the time is easier to spot in this dataset, with unusually large differences in time taken for one language comapred to the other when translating the same document. The UNOG and WTO datasets can be combined. This results in greater error, possibly due to inherent differences in the datasets or because the WTO has more uncertainty. On the other hand, combining datasets might provide a more generalised model and avoid overfitting to one corpus. 
 
