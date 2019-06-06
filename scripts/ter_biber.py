@@ -26,4 +26,4 @@ y = df['Score']
 
 from utils import linear_regression
 
-ols, scaler = linear_regression(X, y)
+linear_regression(X, y)
