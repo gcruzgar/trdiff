@@ -46,12 +46,18 @@ def linear_regression(X, y, test_size=0.2, random_state=123, plots=True):
 
     return ols, scaler, X_test, y_test
 
-def remove_outliers(df, filter_var, lq=10, uq=None):
+def remove_outliers(df, filter_var, lq=0.1, uq=None):
     """ 
     Remove values above upper quantile, uq, and below lower quantile, lq, from dataframe, df, based on column, filter_var.  
     """
+
+    if uq > 1 or lq > 1:
+        lq /= 100
+        uq /= 100
+        print("percentiles should all be in the interval [0, 1]; %.2f and %.2f used instead." % (lq, uq))
+
     if uq == None:
-        uq = 100 - lq
+        uq = 1 - lq
 
     r_uq = df[filter_var].quantile(q=uq)
     r_lq = df[filter_var].quantile(q=lq)
