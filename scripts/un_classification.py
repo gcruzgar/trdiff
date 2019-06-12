@@ -40,7 +40,8 @@ neigh.fit(X_test, y_test)
 
 # Predict using test data
 y_pred = neigh.predict(X_test)
-y_pred_prob = neigh.predict_proba(X_test)
+y_pred_prob = pd.DataFrame(neigh.predict_proba(X_test)).round(2)
+y_pred_prob.columns = ["prob 0", "prob 1", "prob 2"]
 
 # Evaluate results
 diff = {"easy": 0, "average": 1, "difficult": 2}
@@ -52,3 +53,8 @@ for key in diff.keys():
     
     key_val = y_res.loc[y_res["y_pred"] == diff[key]]
     print( "Accuracy for %s: %0.2f%%" % ( key, accuracy_score( key_val["y_test"], key_val["y_pred"] ) * 100 ) )
+
+save_outputs = False
+if save_outputs == True:
+    out_df = pd.concat([y_res, y_pred_prob], axis=1)
+    out_df.to_csv("un_difficulty_classification.csv", index=None)    
