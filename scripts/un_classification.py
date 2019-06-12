@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
 
-from scripts.utils import remove_outliers
+#from scripts.utils import remove_outliers
+from utils import remove_outliers
 
 from sklearn import preprocessing
 from sklearn.metrics import accuracy_score 
