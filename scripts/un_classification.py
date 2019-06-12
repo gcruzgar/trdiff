@@ -27,11 +27,13 @@ df["class"] = 1 # average
 df.loc[df["perday"] >= df["perday"].quantile(0.67), "class"] = 0 # easy
 df.loc[df["perday"] <= df["perday"].quantile(0.33), "class"] = 2 # hard
 
+#print("Number of documents per class: \n{}".format(df["class"].value_counts(sort=False).to_string()))
+
 # Split data into training and tests sets, set random_state for reproducibility
 X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["perday", "class"]), df["class"], test_size=0.15, random_state=42)
 
 # Create classifier
-neigh = KNeighborsClassifier(n_neighbors=10, algorithm='auto')
+neigh = KNeighborsClassifier(n_neighbors=6, algorithm='auto')
 
 # Fit classifier to train data
 neigh.fit(X_test, y_test)
