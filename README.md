@@ -72,6 +72,7 @@ See [biberpy](https://github.com/ssharoff/biberpy) for extraction of Biber dimen
 
 The UNOG (around 200 documents) and WTO (around 100 documents) datasets contain metadata including time taken to translate each document. 
 
+### Regression - translation rate
 Preliminary results using ordinary least squares regression show a weak correlation between biber dimensions and words translated per day. However, there is still large error in the predicted values and the residuals are not completly random error. This could be due to uncertainty in the data itself and other factors affecting the rate of translation that havent been accounted for. The results can be improved slightly by using the total number of words in the document and the category or topic of the document (e.g. which department of the UN) up to an r2-score = 0.43. Using other linear regression methods such as Ridge Regression and Lasso Regression offer very similar results.  
 
 ![UN_OLS](img/un_wpd_ols.png)    
@@ -88,6 +89,17 @@ Note: before extracting Biber dimensions, it is important to make sure there is 
 
 ```bash
 $ sed '/^[[:space:]]*$/d' # remove empty lines (only spaces or tabs).
+```
+
+### Classification - translation difficulty
+Trying to predict the exact time taken to translate a text comes with a lot of uncertainty. The main aim of this work is to describe the factors that influence how hard texts are to translate. In order to gain a better understanding of difficulty, texts can be divided according to the rate of translation. For example, texts could be classified as easy, average or difficult depending on how fast they are translated (in words per day) in comparison with the rest of the corpus.
+
+The labeled UN corpus can be divided into the aforementioned classes. After removal of the top and bottom 5% of values, there are 203 documents. The fastest 67 are considered easy to translate, the slowest 67 difficult to translate and the remaining 69 as average. Using a nearest neighbour classifier on the biber dimensions, the following accuracies are obtained on a test split of 15% of data (n_neighbors=6):
+
+```
+Accuracy for easy: 75.00%
+Accuracy for average: 81.82%
+Accuracy for difficult: 75.00%
 ```
 
 ## Translation Edit Rate
