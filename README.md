@@ -9,7 +9,9 @@ Improve NLP methods by making alterations to input texts or by selecting how and
 - **1.** [Work In Progress](#work-in-progress)    
 - **2.** [Initial Ideas](#initial-ideas)     
 - **3.** [Introduction](#introduction)     
-- **4.** [Biber Dimensions](#biber-dimensions-\--words-per-day)     
+- **4.** [Biber Dimensions](#biber-dimensions-\--words-per-day)    
+    + **4.1** [Regression](#regression-\--translation-rate)  
+    + **4.2** [Classification](#classification-\--translation-difficulty)         
 - **5.** [Translation Edit Rate](#translation-edit-rate)    
 - **6.** [Text Data Pre-Training](#text-data-pre\-training)    
 - **7.** [Semi-Supervised Regression](#semi\-supervised-regression)
@@ -102,6 +104,8 @@ Accuracy for average: 81.82%
 Accuracy for difficult: 75.00%
 ```
 
+This method may have increased uncertainty caused by documents that were recorded as taking 1 day to translate, as it is likely that each document took a different amount of hours. This means translation rates appear to be smaller for shorter documents thus might be incorrectly labeled as _difficult_. 
+
 ## Translation Edit Rate
 "Translation Edit Rate (TER) measures the amount of editing that a human would have to perform to change a sytem output so it exactly matches a reference translation" See "A Study of Translation Edit Rate with Targeted Human Annotation", M. Snover et al. 2006, for more details.
 
@@ -114,9 +118,10 @@ Preliminary results show no correlation between TER and biber dimensions - OLS a
 
 ## Text Data Pre-Training
 See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
-See [ELMo](https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo.md) for PyTorch/tensorflow implementation of Deep contextualized word representations.     
+See [ELMo](https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo.md) for PyTorch/TensorFlow implementation of Deep contextualized word representations.      
+See [BERT](https://github.com/google-research/bert) for a method of pre-training language representations in TensorFlow.     
 
-The idea is to produce sentence embedding vectors which can be used for training. Once unlabelled text data is vectorised, it can be used to predict TER. Once a model is constructed, this can be used to predict words tranlsated per day and ultimately text difficulty.
+The idea is to produce sentence embedding vectors which can be used for training. Once unlabelled text data is vectorised, it can be used to predict TER. Once a model is constructed, this can be used to predict words translated per day and ultimately text difficulty.
 
 ## Semi-Supervised Regression
 Due to the limit in labeled data (currently have access to ~300 documents) and the easier access to unlabeled data, semi-supervised regression is a good candidate for improved regression models.
