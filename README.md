@@ -3,7 +3,8 @@
 The overall objective is to understand what makes a text difficult to translate.  
 Can we predict which text are easier/harder to translate? (for human translation or machine translation)       
 Can we modify or improve existing methods?      
-Improve NLP methods by making alterations to input texts or by selecting how and when new examples are taught to the algorithm.     
+Improve NLP methods by making alterations to input texts or by selecting how and when new examples are taught to the algorithm.      
+Need models that can predict TER on a sentence level and words per day on a document level. Both in either regression or classification tasks.
 
 ## Table of contents
 - **1.** [Work In Progress](#work-in-progress)    
@@ -22,9 +23,9 @@ Improve NLP methods by making alterations to input texts or by selecting how and
     + UN-timed [done]    
     + WTO-timed [done]    
 - **2.** Correlation between Biber-dim and TER score:    
-    + UN-parallel [wip]
-        * Linear-Regression [wip]
-        * Support Vector Machine [wip]            
+    + UN-parallel (linear and SVM regressions)
+        * sentence level [done]
+        * document level [wip]
     + cross-validation    
 - **3.** Use XLM to vectorise texts and correlate with TER score [wip]    
 - **4.** Use TER score to predict time taken or classify text difficulty    
@@ -113,8 +114,8 @@ Computing the TER on a machine translation gives a score based on the minimum nu
 
 Note that in order to compute TER, both a machine translation and a human reference are required. See the [pre-processing](scripts/prepare_ter_docs.py) needed to compute TER for the UN corpus as an example. 
 
-It could be interesting to relate TER score with the Biber dimensions of the original text, to determine if any of these factors makes machine translation harder.
-Preliminary results show no correlation between TER and biber dimensions - OLS and SVR on large UN corpus.
+It could be interesting to relate TER score with the Biber dimensions of the original text, to determine if any of these factors makes machine translation harder. 
+Preliminary results show no correlation between TER and biber dimensions on a sentence level - OLS and SVR on large UN corpus. There is inherent difficulty in this as Biber dimensions are designed to work on a document level whilst TER works best on a sentence level. 
 
 ## Text Data Pre-Training
 See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
