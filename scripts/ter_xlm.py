@@ -86,7 +86,7 @@ def pytorch_regression():
 from sklearn.metrics import accuracy_score 
 from sklearn.neighbors import KNeighborsClassifier
 
-def kn_classification():
+def sk_classification():
     # Load TER scores (will only use first 100 due to memory limit on tensor)
     mt_scores = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
     mt_scores.columns=['score']
@@ -98,7 +98,7 @@ def kn_classification():
     df = pd.concat([mt_scores[0:100], features], axis=1)
 
     # Remove outliers
-    #df = remove_outliers(df, 'score', lq=0.05, uq=0.95) 
+    df = remove_outliers(df, 'score', lq=0.05, uq=0.95) 
 
     # Classify scores depedning on percentile
     df["class"] = 1 # average translation
@@ -116,10 +116,10 @@ def kn_classification():
     X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score", "class"]), df["class"], test_size=0.2, random_state=42)
 
     # Create classifier
-    neigh = KNeighborsClassifier(n_neighbors=3, algorithm='auto')
+    neigh = KNeighborsClassifier(n_neighbors=4, algorithm='auto')
 
     # Fit classifier to train data
-    neigh.fit(X_test, y_test)
+    neigh.fit(X_train, y_train)
 
     # Predict using test data
     y_pred = neigh.predict(X_test)
@@ -141,4 +141,4 @@ def kn_classification():
 
 #sklearn_regression()
 #pytorch_regression()
-kn_classification()
+sk_classification()
