@@ -26,7 +26,7 @@ from scripts.utils import linear_regression
 X = df.drop(columns=['score'])
 y = df['score']
 
-linear_regression(X, y)
+ols, scaler, X_test, y_test = linear_regression(X, y)
 
 """ Classification """
 from sklearn.metrics import accuracy_score 
@@ -43,10 +43,10 @@ df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # bad
 X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score", "class"]), df["class"], test_size=0.2, random_state=42)
 
 # Create classifier
-neigh = KNeighborsClassifier(n_neighbors=5, algorithm='auto')
+neigh = KNeighborsClassifier(n_neighbors=9, algorithm='auto')
 
 # Fit classifier to train data
-neigh.fit(X_test, y_test)
+neigh.fit(X_train, y_train)
 
 # Predict using test data
 y_pred = neigh.predict(X_test)
