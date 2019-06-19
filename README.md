@@ -20,14 +20,18 @@ Need models that can predict TER on a sentence level and words per day on a docu
 ### Work in progress:
 
 - **1.** Correlation between Biber-dim and time taken to translate:    
-    + UN-timed [done]    
+    + UN-timed [done]
+        * regression [done]
+        * classification [wip]    
     + WTO-timed [done]    
 - **2.** Correlation between Biber-dim and TER score:    
-    + UN-parallel (linear and SVM regressions)
-        * sentence level [done]
-        * document level [wip]
+    + UN-parallel (at sentence and document level)
+        * regression [sentence done]
+        * classification [sentece wip]
     + cross-validation    
-- **3.** Use XLM to vectorise texts and correlate with TER score [wip]    
+- **3.** Use XLM to vectorise texts and correlate with TER score 
+    + regression 
+    + classification [wip]
 - **4.** Use TER score to predict time taken or classify text difficulty    
     + Build classifiers + cross-validation 
 
@@ -97,15 +101,9 @@ $ sed '/^[[:space:]]*$/d' # remove empty lines (only spaces or tabs).
 ### Classification - translation difficulty
 Trying to predict the exact time taken to translate a text comes with a lot of uncertainty. The main aim of this work is to describe the factors that influence how hard texts are to translate. In order to gain a better understanding of difficulty, texts can be divided according to the rate of translation. For example, texts could be classified as easy, average or difficult depending on how fast they are translated (in words per day) in comparison with the rest of the corpus.
 
-The labeled UN corpus can be divided into the aforementioned classes. After removal of the top and bottom 5% of values, there are 203 documents. The fastest 67 are considered easy to translate, the slowest 67 difficult to translate and the remaining 69 as average. Using a nearest neighbour classifier on the biber dimensions, the following accuracies are obtained on a test split of 15% of data (n_neighbors=6):
+The labeled UN corpus can be divided into the aforementioned classes. After removal of the top and bottom 5% of values, there are 203 documents. The fastest 67 are considered easy to translate, the slowest 67 difficult to translate and the remaining 69 as average. The data can also be split into more classes, using four quartiles for example. 
 
-```
-Accuracy for easy: 75.00%
-Accuracy for average: 81.82%
-Accuracy for difficult: 75.00%
-```
-
-This method may have increased uncertainty caused by documents that were recorded as taking 1 day to translate, as it is likely that each document took a different amount of hours. This means translation rates appear to be smaller for shorter documents thus might be incorrectly labeled as _difficult_. 
+These method may have increased uncertainty caused by documents that were recorded as taking 1 day to translate, as it is likely that each document took a different amount of hours. This means translation rates appear to be smaller for shorter documents thus might be incorrectly labeled as _difficult_. 
 
 ## Translation Edit Rate
 "Translation Edit Rate (TER) measures the amount of editing that a human would have to perform to change a sytem output so it exactly matches a reference translation" See "A Study of Translation Edit Rate with Targeted Human Annotation", M. Snover et al. 2006, for more details.
