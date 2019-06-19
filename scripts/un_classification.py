@@ -27,6 +27,11 @@ df["class"] = 1 # average
 df.loc[df["perday"] >= df["perday"].quantile(0.67), "class"] = 0 # easy
 df.loc[df["perday"] <= df["perday"].quantile(0.33), "class"] = 2 # hard
 
+# df["class"] = 1 # easy 
+# df.loc[df["perday"] > df["perday"].quantile(0.75), "class"] = 0 # very easy
+# df.loc[df["perday"] <= df["perday"].quantile(0.25), "class"] = 3 # very hard
+# df.loc[(df["perday"] > df["perday"].quantile(0.25)) & (df["perday"] <= df["perday"].quantile(0.5)), "class"] = 2 # hard
+
 #print("Number of documents per class: \n{}".format(df["class"].value_counts(sort=False).to_string()))
 
 # Split data into training and tests sets, set random_state for reproducibility
@@ -42,9 +47,11 @@ neigh.fit(X_test, y_test)
 y_pred = neigh.predict(X_test)
 y_pred_prob = pd.DataFrame(neigh.predict_proba(X_test)).round(2)
 y_pred_prob.columns = ["prob 0", "prob 1", "prob 2"]
+#y_pred_prob.columns = ["prob 0", "prob 1", "prob 2", "prob 3"]
 
 # Evaluate results
 diff = {"easy": 0, "average": 1, "difficult": 2}
+#diff = {"very easy": 0, "easy": 1, "hard": 2, "very hard": 3}
 
 y_res = pd.DataFrame(y_pred, columns=['y_pred'])
 y_res['y_test'] = y_test.values
