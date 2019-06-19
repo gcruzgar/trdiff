@@ -4,12 +4,10 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
 
-#from scripts.utils import remove_outliers
 from utils import remove_outliers
 
 from sklearn import preprocessing
 from sklearn.metrics import accuracy_score 
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 
 # Load data
@@ -23,14 +21,16 @@ df = pd.concat([timed['perday'], biber], axis=1)
 df = remove_outliers(df, 'perday', lq=0.05, uq=0.95) 
 
 # Change regression problem into classification
-df["class"] = 1 # average 
-df.loc[df["perday"] >= df["perday"].quantile(0.67), "class"] = 0 # easy
-df.loc[df["perday"] <= df["perday"].quantile(0.33), "class"] = 2 # hard
-
-# df["class"] = 1 # easy 
-# df.loc[df["perday"] > df["perday"].quantile(0.75), "class"] = 0 # very easy
-# df.loc[df["perday"] <= df["perday"].quantile(0.25), "class"] = 3 # very hard
-# df.loc[(df["perday"] > df["perday"].quantile(0.25)) & (df["perday"] <= df["perday"].quantile(0.5)), "class"] = 2 # hard
+n_class = 3
+if n_class == 3:
+    df["class"] = 1 # average 
+    df.loc[df["perday"] >= df["perday"].quantile(0.67), "class"] = 0 # easy
+    df.loc[df["perday"] <= df["perday"].quantile(0.33), "class"] = 2 # hard
+else:
+    df["class"] = 1 # easy 
+    df.loc[df["perday"] > df["perday"].quantile(0.75), "class"] = 0 # very easy
+    df.loc[df["perday"] <= df["perday"].quantile(0.25), "class"] = 3 # very hard
+    df.loc[(df["perday"] > df["perday"].quantile(0.25)) & (df["perday"] <= df["perday"].quantile(0.5)), "class"] = 2 # hard
 
 #print("Number of documents per class: \n{}".format(df["class"].value_counts(sort=False).to_string()))
 
@@ -38,21 +38,33 @@ df.loc[df["perday"] <= df["perday"].quantile(0.33), "class"] = 2 # hard
 X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["perday", "class"]), df["class"], test_size=0.15, random_state=42)
 
 # Create classifier
-neigh = KNeighborsClassifier(n_neighbors=6, algorithm='auto')
+clf_type = 'kn'
+if clf_type == 'kn':
+    from sklearn.neighbors import KNeighborsClassifier
+    clf = KNeighborsClassifier(n_neighbors=4, algorithm='auto')
+
+elif clf_type == 'dt':
+    from sklearn.tree import DecisionTreeClassifier
+    clf = DecisionTreeClassifier()
+
+elif clf_type == 'sv':
+    from sklearn.svm import SVC
+    clf = SVC(gamma='auto', kernel='linear', C=10.0, probability=True)
 
 # Fit classifier to train data
-neigh.fit(X_test, y_test)
+clf.fit(X_train, y_train)
 
 # Predict using test data
-y_pred = neigh.predict(X_test)
-y_pred_prob = pd.DataFrame(neigh.predict_proba(X_test)).round(2)
-y_pred_prob.columns = ["prob 0", "prob 1", "prob 2"]
-#y_pred_prob.columns = ["prob 0", "prob 1", "prob 2", "prob 3"]
+y_pred = clf.predict(X_test)
+y_pred_prob = pd.DataFrame(clf.predict_proba(X_test)).round(2)
+if n_class == 3:
+    y_pred_prob.columns = ["prob 0", "prob 1", "prob 2"]
+    diff = {"easy": 0, "average": 1, "difficult": 2}
+else:
+    y_pred_prob.columns = ["prob 0", "prob 1", "prob 2", "prob 3"]
+    diff = {"very easy": 0, "easy": 1, "hard": 2, "very hard": 3}
 
 # Evaluate results
-diff = {"easy": 0, "average": 1, "difficult": 2}
-#diff = {"very easy": 0, "easy": 1, "hard": 2, "very hard": 3}
-
 y_res = pd.DataFrame(y_pred, columns=['y_pred'])
 y_res['y_test'] = y_test.values
 
