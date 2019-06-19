@@ -35,6 +35,16 @@ Need models that can predict TER on a sentence level and words per day on a docu
 - **4.** Use TER score to predict time taken or classify text difficulty    
     + Build classifiers + cross-validation 
 
+scores so far (just an indication of what should work or not):
+
+| Classification task (3-class) | words per day | TER   |
+|-------------------------------|---------------|-------|
+| Biber dim                     |         54.3% | 40.7% |
+| XLM embeddings                |           wip | 51.5% |
+
+Note: scores are just rough averages on k-neighbours algorithm with different number of samples and parameter values for each case.
+For comparison, random classification yields a score around 33%, as expected. 
+
 ### Initial Ideas:
 
 - Linear regression using Biber dimensions (predicting words per day):
