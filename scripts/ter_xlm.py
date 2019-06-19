@@ -3,6 +3,8 @@
 import pandas as pd 
 import numpy as np 
 
+from utils import remove_outliers
+
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
@@ -96,17 +98,17 @@ def kn_classification():
     df = pd.concat([mt_scores[0:100], features], axis=1)
 
     # Remove outliers
-    #df = remove_outliers(df, 'perday', lq=0.05, uq=0.95) 
+    #df = remove_outliers(df, 'score', lq=0.05, uq=0.95) 
 
     # Classify scores depedning on percentile
-    df["class"] = 1 # average 
-    df.loc[df["score"] >= df["score"].quantile(0.67), "class"] = 0 # good
-    df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # bad
+    df["class"] = 1 # average translation
+    df.loc[df["score"] >= df["score"].quantile(0.67), "class"] = 0 # good translation
+    df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # bad translation
 
-    # df["class"] = 1 # easy 
-    # df.loc[df["score"] > df["score"].quantile(0.75), "class"] = 0 # very easy
-    # df.loc[df["score"] <= df["score"].quantile(0.25), "class"] = 3 # very hard
-    # df.loc[(df["score"] > df["score"].quantile(0.25)) & (df["score"] <= df["score"].quantile(0.5)), "class"] = 2 # hard
+    # df["class"] = 1 # good translation
+    # df.loc[df["score"] > df["score"].quantile(0.75), "class"] = 0 # very good translation
+    # df.loc[df["score"] <= df["score"].quantile(0.25), "class"] = 3 # very bad translation
+    # df.loc[(df["score"] > df["score"].quantile(0.25)) & (df["score"] <= df["score"].quantile(0.5)), "class"] = 2 # bad translation
 
     #print("Number of documents per class: \n{}".format(df["class"].value_counts(sort=False).to_string()))
 
@@ -126,8 +128,8 @@ def kn_classification():
     #y_pred_prob.columns = ["prob 0", "prob 1", "prob 2", "prob 3"]
 
     # Evaluate results
-    diff = {"good": 0, "average": 1, "bad": 2}
-    #diff = {"very easy": 0, "easy": 1, "hard": 2, "very hard": 3}
+    diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+    #diff = {"very good translation": 0, "good translation": 1, "bad translation": 2, "very bad translation": 3}
 
     y_res = pd.DataFrame(y_pred, columns=['y_pred'])
     y_res['y_test'] = y_test.values
