@@ -129,7 +129,7 @@ These method may have increased uncertainty caused by documents that were record
 ## Translation Edit Rate
 "Translation Edit Rate (TER) measures the amount of editing that a human would have to perform to change a sytem output so it exactly matches a reference translation" See "A Study of Translation Edit Rate with Targeted Human Annotation", M. Snover et al. 2006, for more details.
 
-Computing the TER on a machine translation gives a score based on the minimum number of edits needed to correct the tranlation. This is related to difficulty of translation for a machine, which could hypothetically be correlated to difficulty for human translation. Therefore, TER could be a further source to determine text difficulty. 
+Computing the TER on a machine translation gives a score based on the minimum number of edits needed to correct the tranlation, where a score of 0 would be a perfect translation and 1 would mean the number of edits needed is equal to the number of reference words in the human translation. The score is related to difficulty of translation for a machine, which could hypothetically be correlated to difficulty for human translation. Therefore, TER could be a further source to determine text difficulty. 
 
 Note that in order to compute TER, both a machine translation and a human reference are required. See the [pre-processing](scripts/prepare_ter_docs.py) needed to compute TER for the UN corpus as an example. 
 
@@ -145,6 +145,8 @@ See [ELMo](https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo
 See [BERT](https://github.com/google-research/bert) for a method of pre-training language representations in TensorFlow.     
 
 The idea is to produce sentence embedding vectors which can be used for training. Once unlabelled text data is vectorised, it can be used to predict TER. Once a model is constructed, this can be used to predict words translated per day and ultimately text difficulty.
+
+When using XLM the first hidden state of the last layer is used as input for classification tasks as recommended in the XLM repository.
 
 ## Semi-Supervised Regression
 Due to the limit in labeled data (currently have access to ~300 documents) and the easier access to unlabeled data, semi-supervised regression is a good candidate for improved regression models.
