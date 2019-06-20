@@ -65,6 +65,17 @@ For comparison, random classification yields a score around 33%, as expected.
   + G. Kostopoulos et al 2018, "Semi-Supervised Regression: A recent review"
 - Visualisation of multidimensional data [Basic knowledge of this - would be interesting to see what we can do]   
 
+### Experiments
+
+  + Investigate the distribution of HTER scores on UN-p.es and UN-p.fr: how to split the values into the bins of good, bad, middle? what are the features of each bin?
+  + Train models for sentence level from the English source of UN-p using XLM with 10-fold cross-validation:
+    - classification: prediction of Good, Bad or Middle labels using SVM (RBF), MLP and AdaBoost;\
+      report: Precision/Recall/F1 for each label for each model;
+    - regression: prediction of HTER using Linear regression, SVR (RBF) and AdaBoost\
+      report: correlation, MSE, QQ plot for residuals
+  + Apply the trained UN-p models to UN-t, same classification and regression reports, but no training
+  + Investigate the link between HTER and time to translate on UN-t
+
 ## Introduction
 As one would expect, the time it takes to translate a document is roughly proportional to the number of words it contains (see figure 1). Nonetheless, there is great variance between documents. If time taken was only dependent on the length of a document, the rate of translation (words per day) would be a constant. In the case of the tested UN corpus this would be approximately 1429 words per day. However, as we can see in figure 2, there is a large distribution of translation rates across the documents (standard deviation of 484 words per day). Therefore, there must be other variables causing such differences. 
 
