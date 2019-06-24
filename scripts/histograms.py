@@ -1,4 +1,5 @@
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 from scripts.utils import remove_outliers
 
@@ -29,3 +30,21 @@ def histogram():
     plt.show()
 
 histogram()
+
+def KernelDensity():
+
+    fig, axs = plt.subplots(1, 2, sharey=True)
+
+    sns.kdeplot(es_df.iloc[:,0], bw=0.1, ax=axs[0], legend=False)
+    axs[0].set_xlabel("TER")
+    axs[0].set_ylabel("Density")
+    axs[0].set_title("UN Corpus - Spanish Translations")
+
+    sns.kdeplot(fr_df.iloc[:,0], bw=0.1, ax=axs[1], legend=False)
+    axs[1].set_xlabel("TER")
+    #axs[1].ylabel("Frequency (sentences)")
+    axs[1].set_title("UN Corpus - French Translations")
+
+    plt.show()
+
+KernelDensity()
