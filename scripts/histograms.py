@@ -12,16 +12,20 @@ fr_df.columns=['score']
 
 fr_df = remove_outliers(fr_df, 'score', lq=0.05, uq=0.95)
 
-fig, axs = plt.subplots(1, 2, sharey=True)
+def histogram():
 
-axs[0].hist(es_df.iloc[:,0], bins=40)
-axs[0].set_xlabel("TER")
-axs[0].set_ylabel("Frequency (sentences)")
-axs[0].set_title("UN Corpus - Spanish Translations")
+    fig, axs = plt.subplots(1, 2, sharey=True)
 
-axs[1].hist(fr_df.iloc[:,0], bins=40)
-axs[1].set_xlabel("TER")
-#axs[1].ylabel("Frequency (sentences)")
-axs[1].set_title("UN Corpus - French Translations")
+    axs[0].hist(es_df.iloc[:,0], bins=50, edgecolor='black')
+    axs[0].set_xlabel("TER")
+    axs[0].set_ylabel("Frequency (sentences)")
+    axs[0].set_title("UN Corpus - Spanish Translations")
 
-plt.show()
+    axs[1].hist(fr_df.iloc[:,0], bins=50, edgecolor='black')
+    axs[1].set_xlabel("TER")
+    #axs[1].ylabel("Frequency (sentences)")
+    axs[1].set_title("UN Corpus - French Translations")
+
+    plt.show()
+
+histogram()
