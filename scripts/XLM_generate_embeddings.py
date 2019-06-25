@@ -8,7 +8,7 @@ from src.utils import AttrDict
 from src.data.dictionary import Dictionary, BOS_WORD, EOS_WORD, PAD_WORD, UNK_WORD, MASK_WORD
 from src.model.transformer import TransformerModel
 
-# Load pre-trained model
+# load pre-trained model
 model_path = './models/mlm_tlm_xnli15_1024.pth'
 reloaded = torch.load(model_path)
 params = AttrDict(reloaded['params'])
@@ -39,16 +39,29 @@ model.load_state_dict(reloaded['model'])
 """ """
 
 import pandas as pd
-sentence_df = pd.read_csv("en-fr-100/en-fr-100.en", sep='\n', header=None)[0:100] # read original docs (only first 100 due to memory limit)
+
+# load sentences (first 100 due to memory limit)
+filename = "en-fr-100/en-fr-100.en"
+with open(filename, "r") as f:
+    sentence_list=f.readlines()[0:100] 
+
+# remove new line symbols
+for i in range(0, len(sentence_list)):
+    sentence_list[i] = sentence_list[i].replace("\n", "")
+
+# save as dataframe and add language tokens
+sentence_df = pd.DataFrame(sentence_list)
 sentence_df.columns = ['sentence']
 sentence_df['language'] = 'en'
-sentences = list(zip(sentence_df.sentence, sentence_df.language)) # match xlm format (sentence, language)
+
+# match xlm format (sentence, language)
+sentences = list(zip(sentence_df.sentence, sentence_df.language)) 
 
 """ from XLM repo """
 # add </s> sentence delimiters
 sentences = [(('</s> %s </s>' % sent.strip()).split(), lang) for sent, lang in sentences]
 
-# Create batch
+# create batch
 bs = len(sentences)
 slen = max([len(sent) for sent, _ in sentences])
 
