@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+
+import torch
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
+
 from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, r2_score 
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
@@ -65,3 +67,19 @@ def remove_outliers(df, filter_var, lq=0.1, uq=None):
     df = df.loc[df[filter_var] > r_lq]
 
     return df
+
+def load_embeddings(xlm_path = "data/xlm-embeddings/"):
+
+    embeddings = pd.concat([
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-0_499.pt").data.numpy(), index=range(0,500)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-500_999.pt").data.numpy(), index=range(500,1000)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-1500_1999.pt").data.numpy(), index=range(1500,2000)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2000_2499.pt").data.numpy(), index=range(2000,2500)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2500_2999.pt").data.numpy(), index=range(2500,3000)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3000_3499.pt").data.numpy(), index=range(3000,3500)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3500_3999.pt").data.numpy(), index=range(3500,4000))
+    ], axis=0)
+
+    #pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-1000_1499.pt").data.numpy(), index=range(1000,1500)),
+    
+    return embeddings
