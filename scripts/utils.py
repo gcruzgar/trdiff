@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 from sklearn import linear_model
 from sklearn import preprocessing
+from sklearn.metrics import accuracy_score 
 from sklearn.model_selection import train_test_split
 
 def linear_regression(X, y, test_size=0.2, random_state=123, plots=True):
@@ -87,3 +88,25 @@ def load_embeddings(xlm_path = "data/xlm-embeddings/"):
     ], axis=0)
     
     return embeddings
+
+def evaluate_classification(clf, X_test, y_test):
+    """
+    Predict values for a test set (X_test) and compare with the target values (y_test) for a given classifier (clf).
+    Returns predicted values and prints accuracy for each label.
+    """
+    
+    # Predict using test data
+    y_pred = clf.predict(X_test)
+
+    # Labels
+    diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+
+    y_res = pd.DataFrame(y_pred, columns=['y_pred'])
+    y_res['y_test'] = y_test.values
+
+    for key in diff.keys():
+        
+        key_val = y_res.loc[y_res["y_pred"] == diff[key]]
+        print( "Accuracy for %s: %0.2f%%" % ( key, accuracy_score( key_val["y_test"], key_val["y_pred"] ) * 100 ) )
+
+    return y_res
