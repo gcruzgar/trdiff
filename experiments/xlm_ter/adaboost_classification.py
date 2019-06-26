@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd 
 
 import torch
-from scripts.utils import load_embeddings, remove_outliers
+from scripts.utils import load_embeddings, remove_outliers, evaluate_classification
 
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import train_test_split
@@ -31,13 +31,11 @@ df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # bad translation
 X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score", "class"]), df["class"], test_size=0.2, random_state=42)
 
 # Create classifier
-clf = AdaBoostClassifier(algorithm='SAMME', n_estimators=50, learning_rate=1.0)
+clf = AdaBoostClassifier(algorithm='SAMME.R', n_estimators=50, learning_rate=0.75)
 
 # Fit classifier to train data
 clf.fit(X_train, y_train)
 
-# Predictions
-y_pred = clf.predict(X_test)
-
-# Evaluate results
-print(clf.score(X_test, y_test).round(3))
+# Predict and evaluate results
+print("Score: %0.3f" % clf.score(X_test, y_test))
+y_res = evaluate_classification(clf, X_test, y_test)

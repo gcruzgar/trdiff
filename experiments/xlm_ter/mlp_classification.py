@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd 
 
 import torch
-from scripts.utils import load_embeddings, remove_outliers
+from scripts.utils import load_embeddings, remove_outliers, evaluate_classification
 
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
@@ -33,7 +33,7 @@ X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score", "c
 # for a in [0.00001, 0.0001, 0.001, 0.01, 0.1, 1, 10]:
 
 #     # Create classifier
-#     mlp = MLPClassifier(activation="relu", solver="adam", alpha=a)
+#     mlp = MLPClassifier(activation="relu", solver="adam", alpha=a, random_state=42)
 
 #     # Fit classifier to train data
 #     mlp.fit(X_train, y_train)
@@ -45,13 +45,11 @@ X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score", "c
 #     print("alpha = %0.5f, score = %0.3f" % (a, mlp.score(X_test, y_test)))
 
 # Create classifier
-mlp = MLPClassifier(activation="relu", solver="adam", alpha=0.00001)
+mlp = MLPClassifier(activation="relu", solver="adam", alpha=0.1, random_state=42)
 
 # Fit classifier to train data
 mlp.fit(X_train, y_train)
 
-# Predictions
-y_pred = mlp.predict(X_test)
-
-# Evaluate results
-print(mlp.score(X_test, y_test))
+# Predict and evaluate results
+print("Score: %0.3f" % mlp.score(X_test, y_test))
+y_res = evaluate_classification(mlp, X_test, y_test)

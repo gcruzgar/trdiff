@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd 
 
 import torch
-from scripts.utils import load_embeddings, remove_outliers
+from scripts.utils import load_embeddings, remove_outliers, evaluate_classification
 
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
@@ -48,8 +48,6 @@ clf = SVC(C=C, kernel='rbf', gamma='scale')
 # Fit classifier to train data
 clf.fit(X_train, y_train)
 
-# Predictions
-y_pred = clf.predict(X_test)
-
-# Evaluate results
-print("C = %0.3f, score=%0.3f" % (C, clf.score(X_test, y_test)))
+# Predict and evaluate results
+print("C = %0.3f, score=%0.3f\n" % (C, clf.score(X_test, y_test)))
+y_res = evaluate_classification(clf, X_test, y_test)
