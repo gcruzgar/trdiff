@@ -77,9 +77,13 @@ def load_embeddings(xlm_path = "data/xlm-embeddings/"):
     pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2000_2499.pt").data.numpy(), index=range(2000,2500)),
     pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2500_2999.pt").data.numpy(), index=range(2500,3000)),
     pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3000_3499.pt").data.numpy(), index=range(3000,3500)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3500_3999.pt").data.numpy(), index=range(3500,4000))
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3500_3999.pt").data.numpy(), index=range(3500,4000)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-4500_4999.pt").data.numpy(), index=range(4500,5000)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-5000_5499.pt").data.numpy(), index=range(5000,5500)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-5500_5999.pt").data.numpy(), index=range(5500,6000)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-7000_7499.pt").data.numpy(), index=range(7000,7500)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-7500_7999.pt").data.numpy(), index=range(7500,8000)),
+    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-9500_9999.pt").data.numpy(), index=range(9500,10000))
     ], axis=0)
-
-    #pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-1000_1499.pt").data.numpy(), index=range(1000,1500)),
     
     return embeddings
