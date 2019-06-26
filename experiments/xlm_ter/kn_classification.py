@@ -14,6 +14,16 @@ ter.columns=['score']
 xlm_path = "data/xlm-embeddings/"
 features = load_embeddings(xlm_path)
 
+# Use non-zero biber dimensions as features
+use_biber=False
+if use_biber == True:
+    biber = pd.read_csv("data/en-fr-100.dim", sep='\t')
+
+    drop_cols = biber.columns[(biber == 0).sum() > 0.5*biber.shape[0]]
+    biber.drop(drop_cols, axis=1, inplace=True)
+
+    features = features.merge(biber, left_index=True, right_index=True)
+
 # Join data into single dataframe
 df = ter.merge(features, left_on=ter.index, right_on=features.index)
 
