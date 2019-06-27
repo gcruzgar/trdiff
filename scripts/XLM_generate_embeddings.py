@@ -26,22 +26,12 @@ params.mask_index = dico.index(MASK_WORD)
 # build model / reload weights
 model = TransformerModel(params, dico, True, True)
 model.load_state_dict(reloaded['model'])
-
-# list of (sentences, lang)
-# sentences = [
-#     ('the following secon@@ dary charac@@ ters also appear in the nov@@ el .', 'en'),
-#     ('les zones rurales offr@@ ent de petites routes , a deux voies .', 'fr'),
-#     ('luego del cri@@ quet , esta el futbol , el sur@@ f , entre otros .', 'es'),
-#     ('am 18. august 1997 wurde der astero@@ id ( 76@@ 55 ) adam@@ ries nach ihm benannt .', 'de'),
-#     ('اصدرت عدة افلام وث@@ اي@@ قية عن حياة السيدة في@@ روز من بينها :', 'ar'),
-#     ('此外 ， 松@@ 嫩 平原 上 还有 许多 小 湖泊 ， 当地 俗@@ 称 为 “ 泡@@ 子 ” 。', 'zh'),
-# ]
 """ """
 
 import pandas as pd
 
 # load sentences (first 100 due to memory limit)
-filename = "en-fr-100/en-fr-100.en"
+filename = "en-fr-100/en-fr-100-processed.txt"
 with open(filename, "r") as f:
     sentence_list=f.readlines()[0:100] 
 
