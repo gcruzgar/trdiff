@@ -1,0 +1,7 @@
+# example of how to prepare sentences before applying XLM
+
+# remove digits and turn everything to lower case
+sed 's/\S*[0-9]\S*//g' input_file | tr '[:upper:]' '[:lower:]' > output_file
+
+# apply bpe codes (needs to be run from fastbpe directory)
+./fast applybpe output_file input_file bpe_codes
