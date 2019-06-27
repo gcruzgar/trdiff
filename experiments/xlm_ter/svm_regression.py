@@ -27,20 +27,20 @@ X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score"]), 
 
 # for C in [0.00001, 0.0001, 0.001, 0.01, 0.1, 10, 100]:
 
-#     # Create classifier
+#     # Create model
 #     svr = SVR(C=C, kernel='rbf', gamma='scale')
 
-#     # Fit classifier to train data
+#     # Fit model to train data
 #     svr.fit(X_train, y_train)
 
 #     # Evaluate results
 #     print("C = %f, score=%0.3f\n" % (C, svr.score(X_test, y_test)))
 
-# Create classifier
+# Create model
 C=10
 svr = SVR(C=C, kernel='rbf', gamma='scale')
 
-# Fit classifier to train data
+# Fit model to train data
 svr.fit(X_train, y_train)
 
 # Predict and evaluate results
