@@ -163,7 +163,7 @@ $ ./fast applybpe output_file input_file bpe_codes
 
 Note: fastBPE must be compiled before running. See [fastBPE](https://github.com/glample/fastBPE) for help.
 
-Once the sentences have been prepared, the XLM model can be [applied](scripts/XLM_generate_embeddings.py) to produce tensors of shape (sequence_length, batch_size, model_dimension). When using XLM the first hidden state of the last layer is used as input for classification tasks as recommended in the XLM repository. This corresponds to tensor[0]in python. 
+Once the sentences have been prepared, the XLM model can be [applied](scripts/XLM_generate_embeddings.py) to produce tensors of shape (sequence_length, batch_size, model_dimension). When using XLM the first hidden state of the last layer is used as input for classification tasks as recommended in the XLM repository. This corresponds to tensor[0] in python. Generating sentence embeddings is quite computer intensive so the use of GPUs is advised. For example, the limit of sentences that can be processed at the same time is around 500 for a 128GB CPU, however, the run time is relatively low (around 30 minutes) so the text can be run quite quickly in parallel.   
 
 ## Semi-Supervised Regression
 Due to the limit in labeled data (currently have access to ~300 documents) and the easier access to unlabeled data, semi-supervised regression is a good candidate for improved regression models.
