@@ -65,8 +65,9 @@ lengths = torch.LongTensor([len(sent) for sent, _ in sentences])
 langs = torch.LongTensor([params.lang2id[lang] for _, lang in sentences]).unsqueeze(0).expand(slen, bs)
 
 #if using GPU:
-#lengths.cuda()
-#langs.cuda()
+#word_ids = word_ids.cuda()
+#lenghts = lengths.cuda()
+#langs = langs.cuda()
 
 tensor = model('fwd', x=word_ids, lengths=lengths, langs=langs, causal=False).contiguous()
 print(tensor.size())
