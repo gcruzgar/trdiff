@@ -14,7 +14,8 @@ Need models that can predict TER on a sentence level and words per day on a docu
     + **4.1** [Regression](#regression-\--translation-rate)  
     + **4.2** [Classification](#classification-\--translation-difficulty)         
 - **5.** [Translation Edit Rate](#translation-edit-rate)    
-- **6.** [Text Data Pre-Training](#text-data-pre\-training)    
+- **6.** [Text Data Pre-Training](#text-data-pre\-training)
+    + **6.1** [Sentence Embeddings with XLM](#sentence-embeddings-with-XLM)    
 - **7.** [Semi-Supervised Regression](#semi\-supervised-regression)
   
 ### Work in progress:
@@ -146,7 +147,23 @@ See [BERT](https://github.com/google-research/bert) for a method of pre-training
 
 The idea is to produce sentence embedding vectors which can be used for training. Once unlabelled text data is vectorised, it can be used to predict TER. Once a model is constructed, this can be used to predict words translated per day and ultimately text difficulty.
 
-When using XLM the first hidden state of the last layer is used as input for classification tasks as recommended in the XLM repository.
+### Sentence embeddings with XLM
+
+In order to vectorised texts, a few steps must be followed to prepare data. Firstly, the prefered pre-trained model, BPE codes and vocabulary are obtained from [XLM](https://github.com/facebookresearch/XLM#pretrained-models). In our case we are dealing with translation to different languages so the XNLI-15 model is used (pretrained on masked language modelling and translation language modelling). The texts must be split into sentences before processing. Some texts contain a large amount of digits and serial numbers which are not translated, thus these can de removed before vectorisation. The sentences can then be forced to lower case. For example:
+
+```bash
+$ sed 's/\S*[0-9]\S*//g' input_file | tr '[:upper:]' '[:lower:]' > output_file
+```
+
+The next step is to apply the previously obtained BPE codes to the sentences. This can be done by using the python API or by cloning the fastBPE repo and using the following command:
+
+```bash
+$ ./fast applybpe output_file input_file bpe_codes
+```
+
+Note: fastBPE must be compiled before running. See [fastBPE](https://github.com/glample/fastBPE) for help.
+
+Once the sentences have been prepared, the XLM model can be [applied](scripts/XLM_generate_embeddings.py) to produce tensors of shape (sequence_length, batch_size, model_dimension). When using XLM the first hidden state of the last layer is used as input for classification tasks as recommended in the XLM repository. This corresponds to tensor[0]in python. 
 
 ## Semi-Supervised Regression
 Due to the limit in labeled data (currently have access to ~300 documents) and the easier access to unlabeled data, semi-supervised regression is a good candidate for improved regression models.
