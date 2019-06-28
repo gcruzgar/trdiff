@@ -25,13 +25,14 @@ params.mask_index = dico.index(MASK_WORD)
 
 # build model / reload weights
 model = TransformerModel(params, dico, True, True)
+#model.cuda() #if using GPU
 model.load_state_dict(reloaded['model'])
 """ """
 
 import pandas as pd
 
 # load sentences (first 100 due to memory limit)
-filename = "en-fr-100/en-fr-100-processed.txt"
+filename = "en-fr-100/en-fr-100.processed"
 with open(filename, "r") as f:
     sentence_list=f.readlines()[0:100] 
 
@@ -63,6 +64,9 @@ for i in range(len(sentences)):
 lengths = torch.LongTensor([len(sent) for sent, _ in sentences])
 langs = torch.LongTensor([params.lang2id[lang] for _, lang in sentences]).unsqueeze(0).expand(slen, bs)
 
+#if using GPU:
+#lengths.cuda()
+#langs.cuda()
 
 tensor = model('fwd', x=word_ids, lengths=lengths, langs=langs, causal=False).contiguous()
 print(tensor.size())
