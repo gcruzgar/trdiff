@@ -2,9 +2,10 @@ import numpy as np
 import pandas as pd 
 
 import torch
-from scripts.utils import load_embeddings, remove_outliers, evaluate_classification
+from scripts.utils import load_embeddings, remove_outliers
 
 from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 
 ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
@@ -61,4 +62,7 @@ mlp = MLPClassifier(activation="relu", solver="adam", alpha=0.1, random_state=42
 mlp.fit(X_train, y_train)
 
 # Predict and evaluate results
-y_res = evaluate_classification(mlp, X_test, y_test)
+print("\nclassification report:\n")
+y_pred = clf.predict(X_test)
+diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+print(classification_report(y_res['y_test'], y_res['y_pred'], target_names=diff))
