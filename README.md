@@ -23,7 +23,7 @@ Need models that can predict TER on a sentence level and words per day on a docu
 - **1.** Correlation between Biber-dim and time taken to translate:    
     + UN-timed [done]
         * regression [done]
-        * classification [wip]    
+        * classification [done]    
     + WTO-timed [done]    
 - **2.** Correlation between Biber-dim and TER score:    
     + UN-parallel (at sentence and document level)
@@ -31,7 +31,7 @@ Need models that can predict TER on a sentence level and words per day on a docu
         * classification [sentece wip]
     + cross-validation    
 - **3.** Use XLM to vectorise texts and correlate with TER score 
-    + regression 
+    + regression [wip]
     + classification [wip]
 - **4.** Use TER score to predict time taken or classify text difficulty    
     + Build classifiers + cross-validation 
@@ -45,6 +45,9 @@ scores so far (just an indication of what should work or not):
 
 Note: scores are just rough averages on k-neighbours algorithm with different number of samples and parameter values for each case.
 For comparison, random classification yields a score around 33%, as expected. 
+
+Classifiers in experiments will output f1-score, precision and recall for each label.   
+Regression models will produce r2-score, MSE and QQ plots of residuals.
 
 ### Initial Ideas:
 
