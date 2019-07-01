@@ -95,7 +95,7 @@ def evaluate_classification(clf, X_test, y_test):
     Returns predicted values and prints accuracy for each label.
     """
     
-    print("\nEvaluatin classification...\n")
+    print("\nEvaluating classification...\n")
 
     # Predict using test data
     y_pred = clf.predict(X_test)

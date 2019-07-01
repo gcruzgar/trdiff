@@ -61,5 +61,4 @@ mlp = MLPClassifier(activation="relu", solver="adam", alpha=0.1, random_state=42
 mlp.fit(X_train, y_train)
 
 # Predict and evaluate results
-print("Score: %0.3f" % mlp.score(X_test, y_test))
 y_res = evaluate_classification(mlp, X_test, y_test)

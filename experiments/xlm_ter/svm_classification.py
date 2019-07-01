@@ -27,7 +27,7 @@ if use_biber == True:
 df = ter.merge(features, left_index=True, right_index=True)
 
 # Remove outliers
-rm_out=True
+rm_out=False
 if rm_out == True:
     df = remove_outliers(df, 'score', lq=0.05, uq=0.95) 
     print("data points below 0.05 or above 0.95 quantiles removed")
@@ -59,5 +59,4 @@ clf = SVC(C=C, kernel='rbf', gamma='scale')
 clf.fit(X_train, y_train)
 
 # Predict and evaluate results
-print("C = %0.3f, score=%0.3f\n" % (C, clf.score(X_test, y_test)))
 y_res = evaluate_classification(clf, X_test, y_test)

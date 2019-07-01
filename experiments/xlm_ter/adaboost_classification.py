@@ -47,5 +47,4 @@ clf = AdaBoostClassifier(algorithm='SAMME.R', n_estimators=50, learning_rate=0.7
 clf.fit(X_train, y_train)
 
 # Predict and evaluate results
-print("Score: %0.3f" % clf.score(X_test, y_test))
 y_res = evaluate_classification(clf, X_test, y_test)
