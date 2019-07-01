@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from sklearn import linear_model
 from sklearn import preprocessing
-from sklearn.metrics import accuracy_score 
+from sklearn.metrics import accuracy_score, f1_score 
 from sklearn.model_selection import train_test_split
 
 def linear_regression(X, y, test_size=0.2, random_state=123, plots=True):
@@ -95,6 +95,8 @@ def evaluate_classification(clf, X_test, y_test):
     Returns predicted values and prints accuracy for each label.
     """
     
+    print("\nEvaluatin classification...\n")
+
     # Predict using test data
     y_pred = clf.predict(X_test)
 
@@ -103,6 +105,8 @@ def evaluate_classification(clf, X_test, y_test):
 
     y_res = pd.DataFrame(y_pred, columns=['y_pred'])
     y_res['y_test'] = y_test.values
+
+    print("f1-score = %0.3f" % f1_score(y_test, y_pred, average='weighted'))
 
     for key in diff.keys():
         
