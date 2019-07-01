@@ -63,6 +63,6 @@ mlp.fit(X_train, y_train)
 
 # Predict and evaluate results
 print("\nclassification report:\n")
-y_pred = clf.predict(X_test)
+y_pred = mlp.predict(X_test)
 diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
-print(classification_report(y_res['y_test'], y_res['y_pred'], target_names=diff))
+print(classification_report(y_test, y_pred, target_names=diff))
