@@ -1,12 +1,15 @@
-import pandas as pd 
-import numpy as np 
 import torch
-import matplotlib.pyplot as plt 
+import numpy as np
+import pandas as pd  
 
 from scripts.utils import load_embeddings, remove_outliers, linear_regression
 
 from sklearn.svm import SVR
+from sklearn.metrics import mean_squared_error 
 from sklearn.model_selection import train_test_split
+
+import scipy.stats as stats
+import matplotlib.pyplot as plt
 
 ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
 ter.columns=['score']
@@ -44,4 +47,14 @@ svr = SVR(C=C, kernel='rbf', gamma='scale')
 svr.fit(X_train, y_train)
 
 # Predict and evaluate results
-print("C = %0.3f, score=%0.3f\n" % (C, svr.score(X_test, y_test)))
+y_pred = svr.predict(X_test)
+print("\nC = %0.3f") 
+print("r2-score: %0.3f" % svr.score(X_test, y_test))
+print("MSE: %0.3f" % mean_squared_error(y_test, y_pred))
+
+# Quantile-Quantile residual plots
+residuals = y_test - y_pred
+res = stats.probplot(residuals, plot=plt)
+plt.ylabel("Residuals")
+plt.title("Normal Probability Plot - SVM")
+plt.show()

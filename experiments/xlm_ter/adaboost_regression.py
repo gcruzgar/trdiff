@@ -6,7 +6,11 @@ from scripts.utils import load_embeddings, remove_outliers
 
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import AdaBoostRegressor
+from sklearn.metrics import mean_squared_error 
 from sklearn.model_selection import train_test_split
+
+import scipy.stats as stats
+import matplotlib.pyplot as plt
 
 ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
 ter.columns=['score']
@@ -43,4 +47,13 @@ abr = AdaBoostRegressor(DecisionTreeRegressor(max_depth=6), n_estimators=50, lea
 abr.fit(X_train, y_train)
 
 # Predict and evaluate results
-print("Score: %0.3f" % abr.score(X_test, y_test))
+y_pred = abr.predict(X_test)
+print("r2-score: %0.3f" % abr.score(X_test, y_test))
+print("MSE: %0.3f" % mean_squared_error(y_test, y_pred))
+
+# Quantile-Quantile residual plots
+residuals = y_test - y_pred
+res = stats.probplot(residuals, plot=plt)
+plt.ylabel("Residuals")
+plt.title("Normal Probability Plot - Adaboost Decision Tree")
+plt.show()
