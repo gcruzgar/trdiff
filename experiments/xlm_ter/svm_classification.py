@@ -8,10 +8,10 @@ from sklearn.svm import SVC
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 
-ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
+ter = pd.read_csv("data/en-fr-100/en-fr-100-mt_score.txt", sep='\n', header=None)
 ter.columns=['score']
 
-xlm_path = "data/xlm-embeddings/"
+xlm_path = "data/en-fr-100/xlm-embeddings/"
 features = load_embeddings(xlm_path)
 
 # Use non-zero biber dimensions as features
@@ -60,7 +60,7 @@ clf = SVC(C=C, kernel='rbf', gamma='scale')
 clf.fit(X_train, y_train)
 
 # Predict and evaluate results
-print("\nclassification report:\n")
 y_pred = clf.predict(X_test)
 diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+print("\nclassification report:\n")
 print(classification_report(y_test, y_pred, target_names=diff))

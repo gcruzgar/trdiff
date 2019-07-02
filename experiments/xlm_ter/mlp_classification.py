@@ -8,10 +8,10 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 
-ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
+ter = pd.read_csv("data/en-fr-100/en-fr-100-mt_score.txt", sep='\n', header=None)
 ter.columns=['score']
 
-xlm_path = "data/xlm-embeddings/"
+xlm_path = "data/en-fr-100/xlm-embeddings/"
 features = load_embeddings(xlm_path)
 
 # Use non-zero biber dimensions as features
@@ -62,7 +62,7 @@ mlp = MLPClassifier(activation="relu", solver="adam", alpha=0.1, random_state=42
 mlp.fit(X_train, y_train)
 
 # Predict and evaluate results
-print("\nclassification report:\n")
 y_pred = mlp.predict(X_test)
 diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+print("\nclassification report:\n")
 print(classification_report(y_test, y_pred, target_names=diff))
