@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import os
+import re
+
 import torch
 import numpy as np
 import pandas as pd 
@@ -69,24 +72,37 @@ def remove_outliers(df, filter_var, lq=0.1, uq=None):
 
     return df
 
-def load_embeddings(xlm_path = "data/xlm-embeddings/"):
+def load_embeddings(xlm_path = "data/xlm-embeddings/", save=False):
+    """ Load data from all tensors into single dataframe"""
 
-    embeddings = pd.concat([
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-0_499.pt").data.numpy(), index=range(0,500)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-500_999.pt").data.numpy(), index=range(500,1000)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-1500_1999.pt").data.numpy(), index=range(1500,2000)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2000_2499.pt").data.numpy(), index=range(2000,2500)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2500_2999.pt").data.numpy(), index=range(2500,3000)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3000_3499.pt").data.numpy(), index=range(3000,3500)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3500_3999.pt").data.numpy(), index=range(3500,4000)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-4500_4999.pt").data.numpy(), index=range(4500,5000)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-5000_5499.pt").data.numpy(), index=range(5000,5500)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-5500_5999.pt").data.numpy(), index=range(5500,6000)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-7000_7499.pt").data.numpy(), index=range(7000,7500)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-7500_7999.pt").data.numpy(), index=range(7500,8000)),
-    pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-9500_9999.pt").data.numpy(), index=range(9500,10000))
-    ], axis=0)
+    # embeddings = pd.concat([
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-0_499.pt").data.numpy(), index=range(0,500)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-500_999.pt").data.numpy(), index=range(500,1000)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-1500_1999.pt").data.numpy(), index=range(1500,2000)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2000_2499.pt").data.numpy(), index=range(2000,2500)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-2500_2999.pt").data.numpy(), index=range(2500,3000)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3000_3499.pt").data.numpy(), index=range(3000,3500)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-3500_3999.pt").data.numpy(), index=range(3500,4000)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-4500_4999.pt").data.numpy(), index=range(4500,5000)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-5000_5499.pt").data.numpy(), index=range(5000,5500)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-5500_5999.pt").data.numpy(), index=range(5500,6000)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-7000_7499.pt").data.numpy(), index=range(7000,7500)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-7500_7999.pt").data.numpy(), index=range(7500,8000)),
+    # pd.DataFrame(torch.load(xlm_path+"xlm-embeddings-9500_9999.pt").data.numpy(), index=range(9500,10000))
+    # ], axis=0)
     
+    file_list = os.listdir(xlm_path)
+
+    embeddings = pd.DataFrame()
+    for filename in file_list:
+        ids = re.findall("\d+", filename)
+        df = pd.DataFrame( torch.load(xlm_path+filename).data.numpy(), index=range(int(ids[0]), int(ids[1])+1) )
+        embeddings = pd.concat([embeddings, df], axis=0)
+
+    if save == True:
+        df.index.name='index'
+        embeddings.to_csv("xlm-embeddings.csv")
+
     return embeddings
 
 def evaluate_classification(clf, X_test, y_test):
