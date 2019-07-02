@@ -8,10 +8,10 @@ from scripts.utils import load_embeddings, remove_outliers, linear_regression
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
+ter = pd.read_csv("data/en-fr-100/en-fr-100-mt_score.txt", sep='\n', header=None)
 ter.columns=['score']
 
-xlm_path = "data/xlm-embeddings/"
+xlm_path = "data/en-fr-100/xlm-embeddings/"
 features = load_embeddings(xlm_path)
 
 # Join data into single dataframe

@@ -12,16 +12,16 @@ from sklearn.model_selection import train_test_split
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 
-ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
+ter = pd.read_csv("data/en-fr-100/en-fr-100-mt_score.txt", sep='\n', header=None)
 ter.columns=['score']
 
-xlm_path = "data/xlm-embeddings/"
+xlm_path = "data/en-fr-100/xlm-embeddings/"
 features = load_embeddings(xlm_path)
 
 # Use non-zero biber dimensions as features
 use_biber=False
 if use_biber == True:
-    biber = pd.read_csv("data/en-fr-100.dim", sep='\t')
+    biber = pd.read_csv("data/en-fr-100/en-fr-100.dim", sep='\t')
 
     drop_cols = biber.columns[(biber == 0).sum() > 0.5*biber.shape[0]]
     biber.drop(drop_cols, axis=1, inplace=True)
