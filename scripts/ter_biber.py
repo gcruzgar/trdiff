@@ -11,8 +11,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
-features = pd.read_csv("data/en-fr-100.dim", sep='\t')
-ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\t', header=None)
+features = pd.read_csv("data/en-fr-100/en-fr-100.dim", sep='\t')
+ter = pd.read_csv("data/en-fr-100/en-fr-100-mt_score.txt", sep='\t', header=None)
 ter.columns=['score']
 
 df = pd.concat([features, ter], axis=1) 

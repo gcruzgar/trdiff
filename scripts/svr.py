@@ -8,8 +8,8 @@ from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 
 """ TER """
-features = pd.read_csv("data/en-fr-100.dim", sep='\t')
-ter = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\t', header=None)
+features = pd.read_csv("data/en-fr-100/en-fr-100.dim", sep='\t')
+ter = pd.read_csv("data/en-fr-100/en-fr-100-mt_score.txt", sep='\t', header=None)
 ter.columns=['Score']
 
 df = pd.concat([features, ter], axis=1) 
