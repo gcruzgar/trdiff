@@ -96,6 +96,13 @@ Documents can be split into categories depending on things such as the topic of 
 ![UN_Words_PerDay_Category](img/un_per_day_category.png)        
 **Figure 3.** Average translation rate and standard deviation for each category (UN council) in a set of around 200 United Nations public documents.
 
+The UN dataset can be accesed using wget or similar:
+
+```bash
+$ wget -O $2 'https://daccess-ods.un.org/access.nsf/GetFile?Open&DS='$1'&Lang=E&Type=DOC'
+```
+where $1 is the document code and $2 is the desired output name. Translations can be obtained by replacing Lang=E with Lang=F or Lang=S, for French and Spanish respectively.
+
 ## Biber Dimensions - words per day
 
 Biber dimensions (lexical, syntactic, tex-level... features in texts) can be used to build regression models predicting the rate of translation of documents (in words per day).
