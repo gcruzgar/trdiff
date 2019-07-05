@@ -103,6 +103,8 @@ $ wget -O $2 'https://daccess-ods.un.org/access.nsf/GetFile?Open&DS='$1'&Lang=E&
 ```
 where $1 is the document code and $2 is the desired output name. Translations can be obtained by replacing Lang=E with Lang=F or Lang=S, for French and Spanish respectively.
 
+For more information on the UN Parallel Corpus read the [paper](https://www.aclweb.org/anthology/L16-1561) by M. Ziemski et al. 
+
 ## Biber Dimensions - words per day
 
 Biber dimensions (lexical, syntactic, tex-level... features in texts) can be used to build regression models predicting the rate of translation of documents (in words per day).
