@@ -48,7 +48,7 @@ svr.fit(X_train, y_train)
 
 # Predict and evaluate results
 y_pred = svr.predict(X_test)
-print("\nC = %0.3f") 
+print("\nC = %0.3f" % C) 
 print("r2-score: %0.3f" % svr.score(X_test, y_test))
 print("MSE: %0.3f" % mean_squared_error(y_test, y_pred))
 
