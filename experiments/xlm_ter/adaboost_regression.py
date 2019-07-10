@@ -32,7 +32,7 @@ if use_biber == True:
 df = ter.merge(features, left_index=True, right_index=True)
 
 # Remove outliers
-rm_out=False
+rm_out=True
 if rm_out == True:
     df = remove_outliers(df, 'score', lq=0.05, uq=0.95) 
     print("data points below 0.05 or above 0.95 quantiles removed")

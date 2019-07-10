@@ -2,7 +2,7 @@ import torch
 import numpy as np
 import pandas as pd  
 
-from scripts.utils import load_embeddings, remove_outliers, linear_regression
+from scripts.utils import load_embeddings, remove_outliers
 
 from sklearn.svm import SVR
 from sklearn.metrics import mean_squared_error 
