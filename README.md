@@ -31,23 +31,22 @@ Need models that can predict TER on a sentence level and words per day on a docu
         * classification [sentece wip]
     + cross-validation    
 - **3.** Use XLM to vectorise texts and correlate with TER score 
-    + regression [wip]
-    + classification [wip]
+    + regression [done]
+    + classification [done]
 - **4.** Use TER score to predict time taken or classify text difficulty    
     + Build classifiers + cross-validation 
 
 scores so far (just an indication of what should work or not):
 
-| Classification task (3-class) | words per day | TER   |
-|-------------------------------|---------------|-------|
-| Biber dim                     |         54.3% | 40.7% |
-| XLM embeddings                |           wip | 51.5% |
+| Classification accuracy (3-class) | words per day | TER |
+|-----------------------------------|---------------|-----|
+| Biber dim                         |           48% | 40% |
+| XLM embeddings                    |           wip | 53% |
 
-Note: scores are just rough averages on k-neighbours algorithm with different number of samples and parameter values for each case.
-For comparison, random classification yields a score around 33%, as expected. 
+*Note: Words translated per day are only available for around 300 documents, score shown is accuracy obtained by a k-neighbours classifier (number of knewighbours = 4). TER can be computed for any number of sentences, in this case results are shown for SVM on 200,000 sentences. For comparison, random classification yields a score around 33%, as expected. All results shown for French translations; Spanish offer similar results and in most cases marginally better scores. 
 
-Classifiers in experiments will output f1-score, precision and recall for each label.   
-Regression models will produce r2-score, MSE and QQ plots of residuals.
+Classifiers in experiments output f1-score, precision and recall for each label.   
+Regression models produce r2-score, MSE and QQ plots of residuals.
 
 ### Initial Ideas:
 
