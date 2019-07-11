@@ -11,6 +11,7 @@ def main():
     print("Loading tensors from %s..." % xlm_path)
 
     file_list = os.listdir(xlm_path)
+    print("%d tensors found\n" % len(file_list))
 
     ids=[]  
     t_all=torch.Tensor()
