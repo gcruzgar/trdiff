@@ -59,7 +59,7 @@ diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
 y_res = pd.DataFrame(y_pred, columns=['y_pred'])
 y_res['y_test'] = y_test.values
 
-for key in diff.keys():
-        
-    key_val = y_res.loc[y_res["y_pred"] == diff[key]]
-    print( "Accuracy for %s: %0.2f%%" % ( key, accuracy_score( key_val["y_test"], key_val["y_pred"] ) * 100 ) )
+from sklearn.metrics import classification_report
+diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+print("\nclassification report:\n")
+print(classification_report(y_test, y_pred, target_names=diff))
