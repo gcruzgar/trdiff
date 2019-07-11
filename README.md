@@ -83,17 +83,17 @@ Regression models produce r2-score, MSE and QQ plots of residuals.
 As one would expect, the time it takes to translate a document is roughly proportional to the number of words it contains (see figure 1). Nonetheless, there is great variance between documents. If time taken was only dependent on the length of a document, the rate of translation (words per day) would be a constant. In the case of the tested UN corpus this would be approximately 1429 words per day. However, as we can see in figure 2, there is a large distribution of translation rates across the documents (standard deviation of 484 words per day). Therefore, there must be other variables causing such differences. 
 
 ![UN_Words_PerDay](img/un_words_per_day.png)     
-**Figure 1.** Time it took to translate a document against the length of the document in words for a set of around 200 United Nations public documents.
+**Figure 1.** Time it took to translate a document against the length of the document in words for a set of around 300 United Nations public documents.
 
 As the number and length of documents increases, it would be advantageous to determine what other factors contribute to the translation time and ultimately understand what makes a text hard to translate. This could also influence machine translation (MT) and give insight into the factors that negatively impact the quality of MT. A solid understanding of translation difficulty might lead to changes in the way MT algorithms are taught or even the way documents are written.   
 
 ![UN_Words_PerDay_Histogram](img/un_words_per_day_histogram.png)        
-**Figure 2.** Distribution of translation rate (words per day) for a set of around 200 United Nations public documents.    
+**Figure 2.** Distribution of translation rate (words per day) for a set of around 300 United Nations public documents.    
 
 Documents can be split into categories depending on things such as the topic of the text. In the case of the labeled UN corpus, documents can be split according to the department or committee that emitted the document. These categories may exhibit different behaviours and offer further insight into the varience in translation rate. An example of this is shown in figure 3, where the average translation rate of each category is displayed along with standard deviations.
 
 ![UN_Words_PerDay_Category](img/un_per_day_category.png)        
-**Figure 3.** Average translation rate and standard deviation for each category (UN council) in a set of around 200 United Nations public documents.
+**Figure 3.** Average translation rate and standard deviation for each category (UN council) in a set of around 300 United Nations public documents.
 
 The UN dataset can be accesed using wget or similar:
 
@@ -110,7 +110,7 @@ Biber dimensions (lexical, syntactic, tex-level... features in texts) can be use
 
 See [biberpy](https://github.com/ssharoff/biberpy) for extraction of Biber dimensions in `python`. 
 
-The UNOG (around 200 documents) and WTO (around 100 documents) datasets contain metadata including time taken to translate each document. 
+The UNOG (around 300 documents) and WTO (around 100 documents) datasets contain metadata including time taken to translate each document. 
 
 ### Regression - translation rate
 Preliminary results using ordinary least squares regression show a weak correlation between biber dimensions and words translated per day. However, there is still large error in the predicted values and the residuals are not completly random error. This could be due to uncertainty in the data itself and other factors affecting the rate of translation that havent been accounted for. The results can be improved slightly by using the total number of words in the document and the category or topic of the document (e.g. which department of the UN) up to an r2-score = 0.43. Using other linear regression methods such as Ridge Regression and Lasso Regression offer very similar results.  
@@ -121,11 +121,11 @@ Preliminary results using ordinary least squares regression show a weak correlat
 ![UN_OLS_Residuals](img/un_wpd_ols_residuals.png)    
 **Figure 5.** Difference in predicted and real values for the UNOG dataset. Note the appearance of a trend, possibly due to a systematic error or the increased uncertainty in documents that took to long (external reasons) or too short (lowest timeframe visible is one day).
 
-WTO data has the advantage of including translation times to both French and Spanish, however, results with this dataset seem significantly worse. The uncertainty in the time is easier to spot in this dataset, with unusually large differences in time taken for one language comapred to the other when translating the same document. The UNOG and WTO datasets can be combined. This results in greater error, possibly due to inherent differences in the datasets or because the WTO has more uncertainty. On the other hand, combining datasets might provide a more generalised model and avoid overfitting to one corpus. 
+WTO data has the advantage of including translation times to both French and Spanish, however, results with this dataset seem significantly worse. The uncertainty in the time is easier to spot in this dataset, with unusually large differences in time taken for one language compared to the other when translating the same document. The UNOG and WTO datasets can be combined. This results in greater error, possibly due to inherent differences in the datasets or because the WTO has more uncertainty. On the other hand, combining datasets might provide a more generalised model and avoid overfitting to one corpus. 
 
 It is interesting to note that if outliers are not removed from the combined dataset, the regression becomes quite accurate in the range 0-2500 words per day, however, it also produces significant outliers that throw the entire model off. Could be interesting to only use the model in this range and figure out what produces said outliers (several orders of magnitude wrong).
 
-Note: before extracting Biber dimensions, it is important to make sure there is one text per line and that there are no empty lines as this will cause biber-dim.py to fail. Each corpus may have it's particular solutions. For example:
+Note: before extracting Biber dimensions, it is important to make sure there is one text per line and that there are no empty lines as this will cause _biber-dim.py_ to fail. Each corpus may have it's particular solutions. For example:
 
 ```bash
 $ sed '/^[[:space:]]*$/d' # remove empty lines (only spaces or tabs).
@@ -160,7 +160,7 @@ The idea is to produce sentence embedding vectors which can be used for training
 
 ### Sentence embeddings with XLM
 
-In order to vectorised texts, a few steps must be followed to prepare data. Firstly, the prefered pre-trained model, BPE codes and vocabulary are obtained from [XLM](https://github.com/facebookresearch/XLM#pretrained-models). In our case we are dealing with translation to different languages so the XNLI-15 model is used (pretrained on masked language modelling and translation language modelling). The texts must be split into sentences before processing. Some texts contain a large amount of digits and serial numbers which are not translated, thus these can de removed before vectorisation. The sentences can then be forced to lower case. For example:
+In order to vectorise texts, a few steps must be followed to prepare data. Firstly, the prefered pre-trained model, BPE codes and vocabulary are obtained from [XLM](https://github.com/facebookresearch/XLM#pretrained-models). In our case we are dealing with translation to different languages so the XNLI-15 model is used (pretrained on masked language modelling and translation language modelling). The texts must be split into sentences before processing. Some texts contain a large amount of digits and serial numbers which are not translated, thus these can de removed before vectorisation. The sentences can then be forced to lower case. For example:
 
 ```bash
 $ sed 's/\S*[0-9]\S*//g' input_file | tr '[:upper:]' '[:lower:]' > output_file
