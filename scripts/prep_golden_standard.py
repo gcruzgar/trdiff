@@ -44,9 +44,10 @@ def pre_processing(ht, mt):
         ht.iloc[i] = ht.iloc[i]+ " (A-"+str(i)+")"
         mt.iloc[i] = mt.iloc[i]+ " (A-"+str(i)+")"
 
-    # Remove empty lines:
-    ht = ht[~ht.str.contains("^\s*\(A-[0-9]+\)$")]
-    mt = mt[~mt.str.contains("^\s*\(A-[0-9]+\)$")]
+    # Remove empty lines (based on ht):
+    ht_filter = ~ht.str.contains("^\s*\(A-[0-9]+\)$")
+    ht = ht[ht_filter]
+    mt = mt[ht_filter]
 
     return ht, mt
 
