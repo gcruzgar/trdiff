@@ -36,7 +36,7 @@ def main():
 	with open("mt.txt", 'w') as f:
 		for item in mt:
 			f.write("%s\n" % item)
-	print("Human translation saved to mt.txt")
+	print("Machine translation saved to mt.txt")
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
