@@ -13,7 +13,8 @@ Need models that can predict TER on a sentence level and words per day on a docu
 - **4.** [Biber Dimensions](#biber-dimensions-\--words-per-day)    
     + **4.1** [Regression](#regression-\--translation-rate)  
     + **4.2** [Classification](#classification-\--translation-difficulty)         
-- **5.** [Translation Edit Rate](#translation-edit-rate)    
+- **5.** [Translation Edit Rate](#translation-edit-rate)
+    + **5.1** [Connecting TER and Words per Day](#connecting-ter-and-words-per-day)    
 - **6.** [Text Data Pre-Training](#text-data-pre\-training)
     + **6.1** [Sentence Embeddings with XLM](#sentence-embeddings-with-XLM)    
 - **7.** [Semi-Supervised Regression](#semi\-supervised-regression)
@@ -151,6 +152,11 @@ Note that in order to compute TER, both a machine translation and a human refere
 
 It could be interesting to relate TER score with the Biber dimensions of the original text, to determine if any of these factors makes machine translation harder. 
 Preliminary results show no correlation between TER and biber dimensions on a sentence level - OLS and SVR on large UN corpus. There is inherent difficulty in this as Biber dimensions are designed to work on a document level whilst TER works best on a sentence level. 
+
+### Connecting TER and words per day
+TER and words translated per day are both measures of how difficult a text is to translate. However, TER is a measure of the difficulty for machine translation whilst words per day plays a similar role for human translation. We can assume these two are connected to a certain extent such that if a factor causes machine translation to be harder, it is likely to also contribute to a slower human translation. 
+
+It is challenging to connect TER and words per day because the former is computed on a sentence basis whilst the latter tends to be quoted per document. Another problem is that, whilst TER can be computed on any text with a human reference, there is a lack of open access information on time taken to translate. Having information on the time taken to translate for a small amount of sentences (around 200 sentences), the correlation between TER and time taken was found to be 0.228, whilst that between TER and rate of translation was -0.343. This is just an indication of the correlation as the data available is limited, however, it shows that machine translation and human translation are connected, albeit far from a one-to-one link.    
 
 ## Text Data Pre-Training
 See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
