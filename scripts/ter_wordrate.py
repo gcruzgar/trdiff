@@ -4,7 +4,7 @@ import pandas as pd
 from scripts.utils import remove_outliers, linear_regression
 
 # Load time taken to translate and calculate sentence length
-wpd = pd.read_csv("data/en-es.pe", sep='\t').drop_duplicates()
+wpd = pd.read_csv("data/golden-standard/en-es.pe", sep='\t').drop_duplicates()
 wpd['words'] = 0
 for i in wpd.index:
     wpd['words'][i] = len(wpd['Segment'][i].split())
@@ -15,7 +15,7 @@ time.columns= ["time (ms)", "words"]
 
 """ TER - words per day"""
 # Load TER scores
-ter = pd.read_csv("data/en-es-gs.score", header=None, sep='\t')
+ter = pd.read_csv("data/golden-standard/en-es-gs.score", header=None, sep='\t')
 ter.columns = ["score"]
 
 # Join important columns to single dataframe
@@ -32,8 +32,11 @@ df = remove_outliers(df, 'rate', lq=0.05, uq=0.95)
 print(df.corr().round(3)['score'])
 
 """ XLM - words per day """
-# Load sentece embeddings
-features = pd.DataFrame(torch.load("data/gs-xlm-embeddings.pt").data.numpy())
-reg_df = df.merge(features, left_index=True, right_index=True)
+def xlm_regression():
+    # Load sentece embeddings
+    features = pd.DataFrame(torch.load("data/golden-standard/en-es-gs-xlm-embeddings.pt").data.numpy())
+    reg_df = df.merge(features, left_index=True, right_index=True)
 
-#ols, scaler, X_test, y_test = linear_regression(reg_df[], reg_df['perms'])
+    ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df['perms'])
+
+#xlm_regression()
