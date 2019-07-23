@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+
 import re
 import pandas as pd 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
-df = pd.read_csv("data/en-es.pe", sep='\t').drop_duplicates()
+df = pd.read_csv("data/golden-standard/en-es.pe", sep='\t').drop_duplicates()
 
 # Sentence word count
 # df['words'] = 0
@@ -18,15 +20,15 @@ ht = df['Translation'].copy()
 
 assert len(ht) == len(mt), "length of ht and mt are not equal"
 
-def pre_processing(ht, mt):
+def pre_processing(ht, mt, lg="es"):
 
     print("processing %d sentences..." % len(ht))
 
     for i in range(0, len(ht)):
         
         # remove <g ids>   
-        ht.iloc[i] = re.sub('<g id=\"[0-9]\">', "", ht.iloc[i])
-        mt.iloc[i] = re.sub('<g id=\"[0-9]\">', "", mt.iloc[i])
+        ht.iloc[i] = re.sub('<(g|ex) id=\"*(|_)[0-9]\"*(|\/)>', "", ht.iloc[i])
+        mt.iloc[i] = re.sub('<(g|ex) id=\"*(|_)[0-9]\"*(|\/)>', "", mt.iloc[i])
 
         # remove </g>   
         ht.iloc[i] = re.sub('</g>', "", ht.iloc[i])
@@ -44,6 +46,9 @@ def pre_processing(ht, mt):
         ht.iloc[i] = ht.iloc[i]+ " (A-"+str(i)+")"
         mt.iloc[i] = mt.iloc[i]+ " (A-"+str(i)+")"
 
+        if lg=="fr":
+            mt.iloc[i] = re.sub("&#39;", "'", mt.iloc[i])
+
     # Remove empty lines (based on ht):
     ht_filter = ~ht.str.contains("^\s*\(A-[0-9]+\)$")
     ht = ht[ht_filter]
@@ -51,7 +56,7 @@ def pre_processing(ht, mt):
 
     return ht, mt
 
-ht, mt = pre_processing(ht, mt)
+ht, mt = pre_processing(ht, mt, lg='es')
 
 # Save outputs to new file
 with open("ht.txt", 'w') as f:
