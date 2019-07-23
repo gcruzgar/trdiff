@@ -26,10 +26,35 @@ df['perms'] = df['words'] / df['time (ms)']
 df['rate'] = (df['perms'] - df['perms'].min()) / (df['perms'].max() - df['perms'].min())
 
 # Remove outliers
-df = remove_outliers(df, 'rate', lq=0.05, uq=0.95)
+dfr = remove_outliers(df, 'rate', lq=0.05, uq=0.95)
 
 # Correlation
-print(df.corr().round(3)['score'])
+print(dfr.corr().round(3)['score'])
+
+# Quantiles
+q1 = df.loc[df['perms'] <= df['perms'].quantile(0.25)]
+q2 = df.loc[(df['perms'] >= df['perms'].quantile(0.25)) & (df['perms'] <= df['perms'].quantile(0.50))]
+q3 = df.loc[(df['perms'] >= df['perms'].quantile(0.50)) & (df['perms'] <= df['perms'].quantile(0.75))]
+q4 = df.loc[df['perms'] >= df['perms'].quantile(0.75)]
+
+q_corr={}
+q_df={1:q1, 2:q2, 3:q3, 4:q4}
+for q in range(1,5):
+    q_corr[q] = q_df[q].corr()['score']
+
+qcor_df = pd.DataFrame.from_dict(q_corr)
+qcor_df.columns=['q1', 'q2', 'q3', 'q4']
+
+print(qcor_df)
+
+#plots
+import matplotlib.pyplot as plt
+plt.scatter(df['perms'], df['score'])
+plt.xlabel("words translated per ms")
+plt.ylabel("TER")
+plt.xlim([min(df['perms'])-0.0001, max(df['perms'])+0.0001])
+#plt.scatter(q3['perms'], q3['score'])
+plt.show()
 
 """ XLM - words per day """
 def xlm_regression():
