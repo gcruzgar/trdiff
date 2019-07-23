@@ -15,7 +15,7 @@ time.columns= ["time (ms)", "words"]
 
 """ TER - words per day"""
 # Load TER scores
-ter = pd.read_csv("data/golden-standard/en-fr-gs.score", header=None, sep='\t')
+ter = pd.read_csv("data/golden-standard/en-es-gs.score", header=None, sep='\t')
 ter.columns = ["score"]
 
 # Join important columns to single dataframe
