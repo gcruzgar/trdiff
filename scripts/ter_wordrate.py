@@ -1,10 +1,10 @@
-import torch
 import numpy as np
 import pandas as pd 
 from scripts.utils import remove_outliers, linear_regression
 
+lan = "es"
 # Load time taken to translate and calculate sentence length
-wpd = pd.read_csv("data/golden-standard/en-es.pe", sep='\t').drop_duplicates()
+wpd = pd.read_csv("data/golden-standard/en-"+lan+".pe", sep='\t').drop_duplicates()
 wpd['words'] = 0
 for i in wpd.index:
     wpd['words'][i] = len(wpd['Segment'][i].split())
@@ -15,7 +15,7 @@ time.columns= ["time (ms)", "words"]
 
 """ TER - words per day"""
 # Load TER scores
-ter = pd.read_csv("data/golden-standard/en-es-gs.score", header=None, sep='\t')
+ter = pd.read_csv("data/golden-standard/en-"+lan+"-gs.score", header=None, sep='\t')
 ter.columns = ["score"]
 
 # Join important columns to single dataframe
@@ -32,7 +32,7 @@ dft = df.loc[df['score'] != 0]
 dfr = remove_outliers(df, 'rate', lq=0.05, uq=0.95)
 
 # Correlation
-print(dft.corr().round(3)['score'])
+print(dfr.corr().round(3)['score'])
 
 # Quantiles
 q1 = df.loc[df['perms'] <= df['perms'].quantile(0.25)]
@@ -61,10 +61,25 @@ plt.show()
 
 """ XLM - words per day """
 def xlm_regression():
+    import torch
     # Load sentece embeddings
-    features = pd.DataFrame(torch.load("data/golden-standard/en-es-gs-xlm-embeddings.pt").data.numpy())
+    features = pd.DataFrame(torch.load("data/golden-standard/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
     reg_df = df.merge(features, left_index=True, right_index=True)
 
     ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df['perms'])
 
 #xlm_regression()
+
+""" kde plots """
+import seaborn as sns 
+sns.distplot(dfr['perms'], hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.00015})
+
+plt.ylabel("Density")
+plt.xlabel("Translation Rate (words per ms)")
+
+if lan == "es":
+    plt.title("Timed Sentence Translation - Spanish")
+elif lan == "fr":
+    plt.title("Timed Sentence Translation - French")
+
+plt.show()
