@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd 
+
 from scripts.utils import remove_outliers, linear_regression
+
+import torch
 
 lan = "es"
 # Load time taken to translate and calculate sentence length
@@ -61,14 +64,44 @@ plt.show()
 
 """ XLM - words per day """
 def xlm_regression():
-    import torch
+
     # Load sentece embeddings
     features = pd.DataFrame(torch.load("data/golden-standard/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
     reg_df = df.merge(features, left_index=True, right_index=True)
 
     ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df['perms'])
 
+def xlm_classification():
+    from sklearn.svm import SVC
+    from sklearn.metrics import classification_report
+    from sklearn.model_selection import train_test_split
+    
+    # Load sentece embeddings
+    features = pd.DataFrame(torch.load("data/golden-standard/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+
+    # Classify translation rate based on percentile
+    df["class"] = 1 # average rate
+    df.loc[df["rate"] >= df["rate"].quantile(0.67), "class"] = 0 # fast rate
+    df.loc[df["rate"] <= df["rate"].quantile(0.33), "class"] = 2 # slow rate
+
+    # Split data into training and tests sets, set random_state for reproducibility
+    X_train, X_test, y_train, y_test = train_test_split(features, df["class"], test_size=0.2, random_state=42)
+
+    # Create classifier
+    C=1
+    clf = SVC(C=C, kernel='rbf', gamma='scale')
+
+    # Fit classifier to train data
+    clf.fit(X_train, y_train)
+
+    # Predict and evaluate results
+    y_pred = clf.predict(X_test)
+    diff = {"fast rate": 0, "average rate": 1, "slow rate": 2}
+    print("\nclassification report:\n")
+    print(classification_report(y_test, y_pred, target_names=diff))
+
 #xlm_regression()
+xlm_classification()
 
 """ kde plots """
 import seaborn as sns 
