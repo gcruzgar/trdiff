@@ -69,7 +69,7 @@ y_res = pd.DataFrame(y_pred, columns=['y_pred'])
 y_res['y_test'] = y_test.values
 
 from sklearn.metrics import classification_report
-diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+diff = {"fast translation": 0, "average translation": 1, "slow translation": 2}
 print("\nclassification report:\n")
 print(classification_report(y_test, y_pred, target_names=diff))
 
