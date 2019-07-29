@@ -36,8 +36,8 @@ def sk_classification(df, rm_out=False):
 
     # Classify scores depedning on percentile
     df["class"] = 1 # average translation
-    df.loc[df["score"] >= df["score"].quantile(0.67), "class"] = 0 # good translation
-    df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # bad translation
+    df.loc[df["score"] >= df["score"].quantile(0.67), "class"] = 0 # bad translation
+    df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # good translation
 
     # Split data into training and tests sets, set random_state for reproducibility
     X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score", "class"]), df["class"], test_size=0.2, random_state=42)
@@ -78,7 +78,7 @@ def sk_classification(df, rm_out=False):
         y_pred_prob.columns = ["prob 0", "prob 1", "prob 2"]
 
         # Evaluate results
-        diff = {"good translation": 0, "average translation": 1, "bad translation": 2}
+        diff = {"bad translation": 0, "average translation": 1, "good translation": 2}
 
         y_res = pd.DataFrame(y_pred, columns=['y_pred'])
         y_res['y_test'] = y_test.values
