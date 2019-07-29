@@ -3,7 +3,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from scripts.utils import remove_outliers
 
-wto = pd.read_csv("data/wto_timed_all.csv")
+wto = pd.read_csv("data/wto/wto_timed_all.csv")
 
 wto_french = remove_outliers(wto, 'PERDAY FRENCH', lq=0.05, uq=0.94).drop(columns=['DAYS SPANISH', 'PERDAY SPANISH'])
 wto_spanish = remove_outliers(wto, 'PERDAY SPANISH', lq=0.05, uq=0.94).drop(columns=['DAYS FRENCH', 'PERDAY FRENCH'])
@@ -13,7 +13,7 @@ un = pd.read_csv("data/timed-un/reliable.dat", sep=' ')
 
 def combined_plot():
 
-    fig, axs = plt.subplots(1, 3, sharey=True)
+    fig, axs = plt.subplots(1, 3, sharey=True, figsize=(15,15))
 
     sns.distplot(un['perday'], hist=True, kde=True, bins=20, hist_kws={'edgecolor':'black'}, kde_kws={'bw':200}, ax=axs[0])
     axs[0].set_xlabel("Translation rate (words per day)")
@@ -41,7 +41,7 @@ def compare_un_wto_averages():
     wto_ave = wto_ave[wto_ave > wto_ave.quantile(q=0.5) - 1.5*iqr]
     wto_ave = wto_ave[wto_ave < wto_ave.quantile(q=0.5) + 1.5*iqr]
 
-    fig, axs = plt.subplots(1, 2, sharey=True)
+    fig, axs = plt.subplots(1, 2, sharey=True, figsize=(15,15))
 
     sns.distplot(un['perday'], hist=True, kde=True, bins=20, hist_kws={'edgecolor':'black'}, kde_kws={'bw':200}, ax=axs[0])
     axs[0].set_xlabel("Translation rate (words per day)")

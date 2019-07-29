@@ -1,29 +1,28 @@
 #!/usr/bin/env python3
 
-import pandas as pd
+import os
 import numpy as np 
+import pandas as pd
 
 from sklearn.metrics import accuracy_score 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 
 import torch
+from scripts.utils import load_embeddings
 
 def sk_classification(rm_out=False):
 
     # Load TER scores 
-    mt_scores = pd.read_csv("data/en-fr-100-mt_score.txt", sep='\n', header=None)
+    mt_scores = pd.read_csv("data/en-fr-100/en-fr-100-mt_score.txt", sep='\n', header=None)
     mt_scores.columns=['score']
 
     # Load XLM embeddings and join tensors into dataframe
-    emb_path = "data/xlm-embeddings/"
-    emb_0_499 = pd.DataFrame(torch.load(emb_path+"xlm-embeddings-en-fr-0_499.pt").data.numpy())
-    emb_500_1000 = pd.DataFrame(torch.load(emb_path+"xlm-embeddings-en-fr-500_1000.pt").data.numpy())
-
-    features = pd.concat([emb_0_499, emb_500_1000], axis=0, ignore_index=True)
+    emb_path = "data/en-fr-100/xlm-embeddings/"
+    features = load_embeddings(emb_path)
 
     # Join data into single dataframe
-    df = pd.concat([mt_scores[0:499], features], axis=1)
+    df = pd.concat([mt_scores, features], axis=1)
 
     # Remove outliers
     if rm_out == True:

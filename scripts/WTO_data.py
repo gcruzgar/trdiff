@@ -42,7 +42,7 @@ def remove_outliers(time_df, q):
 def main():
 
     # Load translation time data
-    orig_df = pd.read_excel("data/Tableau_stats.xlsx") 
+    orig_df = pd.read_excel("data/wto/Tableau_stats.xlsx") 
 
     # Drop duplicate entries
     orig_df.drop_duplicates(subset=['JOB N°', 'SYMBOL', 'WORDS'],inplace=True)

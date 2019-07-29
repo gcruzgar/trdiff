@@ -31,8 +31,8 @@ def remove_outliers(time_df, q):
 
     return time_df
 
-features = pd.read_csv("data/biber_wto.dat", sep='\t')
-tr = pd.read_csv("data/wto_timed.csv")
+features = pd.read_csv("data/wto/biber_wto.dat", sep='\t')
+tr = pd.read_csv("data/wto/wto_timed.csv")
 
 df = pd.concat([features, tr], axis=1)
 df = remove_outliers(df, q=10)
