@@ -3,19 +3,19 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from scripts.utils import remove_outliers
 
-es_df = pd.read_csv("data/es-mt-score.txt", header=None, sep='\n')
+es_df = pd.read_csv("data/un-parallel/es-mt-score.txt", header=None, sep='\n')
 es_df.columns=['score']
 
 es_df = remove_outliers(es_df, 'score', lq=0.05, uq=0.95)
 
-fr_df = pd.read_csv("data/fr-mt-score.txt", header=None, sep='\n')
+fr_df = pd.read_csv("data/un-parallel/fr-mt-score.txt", header=None, sep='\n')
 fr_df.columns=['score']
 
 fr_df = remove_outliers(fr_df, 'score', lq=0.05, uq=0.95)
 
 def histogram():
 
-    fig, axs = plt.subplots(1, 2, sharey=True)
+    fig, axs = plt.subplots(1, 2, sharey=True, figsize=(15,15))
 
     axs[0].hist(es_df.iloc[:,0], bins=25, edgecolor='black')
     axs[0].set_xlabel("TER")
@@ -31,7 +31,7 @@ def histogram():
 
 def KernelDensity():
 
-    fig, axs = plt.subplots(1, 2, sharey=True)
+    fig, axs = plt.subplots(1, 2, sharey=True, figsize=(15,15))
 
     sns.kdeplot(es_df.iloc[:,0], bw=0.05, ax=axs[0], legend=False)
     axs[0].set_xlabel("TER")
@@ -47,7 +47,7 @@ def KernelDensity():
 
 def combined_plot():
 
-    fig, axs = plt.subplots(1, 2, sharey=True)
+    fig, axs = plt.subplots(1, 2, sharey=True, figsize=(15,15))
 
     sns.distplot(es_df.iloc[:,0], hist=True, kde=True, bins=25, hist_kws={'edgecolor':'black'}, kde_kws={'bw':0.05}, ax=axs[0])#, label=False)
     axs[0].set_xlabel("TER")
