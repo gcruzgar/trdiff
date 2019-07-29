@@ -4,7 +4,8 @@ import re
 import pandas as pd 
 #import matplotlib.pyplot as plt
 
-df = pd.read_csv("data/golden-standard/en-es.pe", sep='\t').drop_duplicates()
+lan = "es"
+df = pd.read_csv("data/golden-standard/en-"+lan+".pe", sep='\t').drop_duplicates()
 
 # Sentence word count
 # df['words'] = 0
@@ -14,7 +15,7 @@ df = pd.read_csv("data/golden-standard/en-es.pe", sep='\t').drop_duplicates()
 #plt.scatter(df['words'], df['Time-to-edit'])
 #a = df.loc[(df['words']>4) & (df['words']<15)]
 
-en = df['Segment'].copy()
+#en = df['Segment'].copy()
 mt = df['Suggestion'].copy()
 ht = df['Translation'].copy()
 
@@ -56,7 +57,7 @@ def pre_processing(ht, mt, lg="es"):
 
     return ht, mt
 
-ht, mt = pre_processing(ht, mt, lg='es')
+ht, mt = pre_processing(ht, mt, lg=lan)
 
 # Save outputs to new file
 with open("ht.txt", 'w') as f:
@@ -68,3 +69,6 @@ with open("mt.txt", 'w') as f:
 	for item in mt:
 		f.write("%s\n" % item)
 print("Machine translation saved to mt.txt")
+
+en = df.loc[ht.index]
+en.to_csv("en-"+lan+".processed", index=False, sep='\t')
