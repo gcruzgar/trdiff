@@ -8,9 +8,11 @@ import torch
 lan = "es"
 # Load time taken to translate and calculate sentence length
 wpd = pd.read_csv("data/golden-standard/en-"+lan+".pe", sep='\t').drop_duplicates()
-wpd['words'] = 0
+
+words=[]
 for i in wpd.index:
-    wpd['words'][i] = len(wpd['Segment'][i].split())
+    words.append(len(wpd['Segment'][i].split()))
+wpd["words"] = words 
 
 # Filter empty sentences (with only serial number)
 time = wpd.loc[~wpd['Segment'].str.contains("^\s*\S*[0-9]\S*\s*$"), ['Time-to-edit', 'words']].reset_index(drop=True)
@@ -105,10 +107,10 @@ xlm_classification()
 
 """ kde plots """
 import seaborn as sns 
-sns.distplot(dfr['perms'], hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.00015})
+sns.distplot(dfr['perms']*100, hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.015})
 
 plt.ylabel("Density")
-plt.xlabel("Translation Rate (words per ms)")
+plt.xlabel("Translation Rate (words per second)")
 
 if lan == "es":
     plt.title("Timed Sentence Translation - Spanish")
