@@ -6,7 +6,12 @@ from scripts.utils import remove_outliers, linear_regression
 import torch
 
 lan = "es"
+if lan == "es":
+    language = "Spanish"
+elif lan == "fr":
+    language = "French"
 # Load time taken to translate and calculate sentence length
+
 wpd = pd.read_csv("data/golden-standard/en-"+lan+".pe", sep='\t').drop_duplicates()
 
 words=[]
@@ -55,7 +60,7 @@ qcor_df.columns=['q1', 'q2', 'q3', 'q4']
 
 print(qcor_df.round(3))
 
-#plots
+# scatter plots
 import matplotlib.pyplot as plt
 plt.scatter(df['perms'], df['score'])
 plt.xlabel("words translated per ms")
@@ -63,6 +68,26 @@ plt.ylabel("TER")
 plt.xlim([min(df['perms'])-0.0001, max(df['perms'])+0.0001])
 #plt.scatter(q3['perms'], q3['score'])
 plt.show()
+
+plt.figure()
+plt.scatter(dfr['words'], dfr['time (ms)'])
+plt.plot(np.unique(dfr['words']), np.poly1d(np.polyfit(dfr['words'], dfr['time (ms)'], 1))(np.unique(dfr['words'])), 'r--')
+plt.xlabel("Sentence length (words)")
+plt.ylabel("Time taken to translate (ms)")
+plt.title("Timed Sentences - %s" % language)
+plt.show()
+
+plt.figure()
+plt.scatter(dfr['words'], dfr['score'])
+#plt.plot(np.unique(dfr['words']), np.poly1d(np.polyfit(dfr['words'], dfr['score'], 1))(np.unique(dfr['words'])), 'r--')
+plt.xlabel("Sentence length (words)")
+plt.ylabel("TER")
+plt.title("Timed Sentences - %s" % language)
+plt.show()
+
+c, m = np.polynomial.polynomial.polyfit(dfr['words'], dfr['time (ms)'], 1)
+y_pred = m*dfr['words'] + c 
+residuals = dfr['time (ms)'] - y_pred
 
 """ XLM - words per day """
 def xlm_regression():
@@ -119,10 +144,6 @@ elif pl=="words":
     plt.xlabel("Sentence Length (number of words)")
 
 plt.ylabel("Density")
-
-if lan == "es":
-    plt.title("Timed Sentence Translation - Spanish")
-elif lan == "fr":
-    plt.title("Timed Sentence Translation - French")
+plt.title("Timed Sentence Translation - %s" % language)
 
 plt.show()
