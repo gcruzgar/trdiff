@@ -107,10 +107,18 @@ xlm_classification()
 
 """ kde plots """
 import seaborn as sns 
-sns.distplot(dfr['perms']*100, hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.015})
+pl = "rate"
+if pl=="rate":
+    sns.distplot(dfr['perms']*100, hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.015})
+    plt.xlabel("Translation Rate (words per second)")
+elif pl=="ter":
+    sns.distplot(dfr['score'], hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.05})
+    plt.xlabel("TER")
+elif pl=="words":
+    sns.distplot(dfr['words'], hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 5})
+    plt.xlabel("Sentence Length (number of words)")
 
 plt.ylabel("Density")
-plt.xlabel("Translation Rate (words per second)")
 
 if lan == "es":
     plt.title("Timed Sentence Translation - Spanish")
