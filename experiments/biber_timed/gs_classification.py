@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
@@ -8,10 +10,11 @@ from sklearn import preprocessing
 from sklearn.metrics import accuracy_score 
 from sklearn.model_selection import train_test_split
 
-lan = "fr"
+lan = "es"
+b_lan="en"
 # Load data
 timed = pd.read_csv("data/golden-standard/en-"+lan+".processed", sep='\t')
-biber = pd.read_csv("data/golden-standard/en-"+lan+"-gs.dim", sep='\t')
+biber = pd.read_csv("data/golden-standard/en-"+lan+"-biber."+b_lan, sep='\t')
 
 # Calculated words translated per second
 words=[]
