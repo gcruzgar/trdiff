@@ -3,3 +3,5 @@ data/
 biberpy/
 __pycache__
 MANIFEST
+dist/
+*.egg-info
