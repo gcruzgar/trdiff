@@ -85,9 +85,52 @@ plt.ylabel("TER")
 plt.title("Timed Sentences - %s" % language)
 plt.show()
 
+# Line of best fit and distance from each point to the line
 c, m = np.polynomial.polynomial.polyfit(dfr['words'], dfr['time (ms)'], 1)
 y_pred = m*dfr['words'] + c 
 residuals = dfr['time (ms)'] - y_pred
+median_error = abs(residuals).median()
+pos_res = residuals.loc[residuals > median_error] # points below the line
+neg_res = residuals.loc[residuals < -median_error] # points above the line
+
+# Load biber dimension and select useful dimensions
+biber = pd.read_csv("data/golden-standard/en-"+lan+"-biber.en", sep='\t')
+drop_cols = biber.columns[(biber == 0).sum() > 0.5*biber.shape[0]]
+biber.drop(drop_cols, axis=1, inplace=True)
+
+pos_res_df = biber.loc[pos_res.index]
+neg_res_df = biber.loc[neg_res.index]
+
+# biber plots
+fig, axs = plt.subplots(1, 3, figsize=(15,15))
+fig.suptitle('Timed Sentences - %s' % language, fontsize=16)
+
+axs[0].scatter(pos_res_df['f26.NOUN'], pos_res_df['f27.wordLength'])
+axs[0].scatter(neg_res_df['f26.NOUN'], neg_res_df['f27.wordLength'])
+axs[0].set_xlabel('f26.NOUN')
+axs[0].set_ylabel('f27.wordLength')
+axs[0].legend(['below-lobf', 'above-lobf'])
+
+axs[1].scatter(pos_res_df['f28.ADP'], pos_res_df['f29.typeTokenRatio'])
+axs[1].scatter(neg_res_df['f28.ADP'], neg_res_df['f29.typeTokenRatio'])
+axs[1].set_xlabel('f28.ADP')
+axs[1].set_ylabel('f29.typeTokenRatio')
+axs[1].legend(['below-lobf', 'above-lobf'])
+
+if lan=='fr':
+    axs[2].scatter(pos_res_df['f30.attributiveAdjectives'], pos_res_df['f57.conjuncts'])
+    axs[2].scatter(neg_res_df['f30.attributiveAdjectives'], neg_res_df['f57.conjuncts'])
+    axs[2].set_xlabel('f30.attributiveAdjectives')
+    axs[2].set_ylabel('f57.conjuncts')
+    axs[2].legend(['below-lobf', 'above-lobf'])
+elif lan=='es':
+    axs[2].scatter(pos_res_df['f30.attributiveAdjectives'], pos_res_df['f47.nominalizations'])
+    axs[2].scatter(neg_res_df['f30.attributiveAdjectives'], neg_res_df['f47.nominalizations'])
+    axs[2].set_xlabel('f30.attributiveAdjectives')
+    axs[2].set_ylabel('f47.nominalizations')
+    axs[2].legend(['below-lobf', 'above-lobf'])
+
+plt.show()
 
 """ XLM - words per day """
 def xlm_regression():
