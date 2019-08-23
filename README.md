@@ -7,7 +7,7 @@ Improve NLP methods by making alterations to input texts or by selecting how and
 Need models that can predict TER on a sentence level and words per day on a document level. Both in either regression or classification tasks.
 
 ## Table of contents
-- **1.** [Work In Progress](#work-in-progress)    
+- **1.** [Work in Progress](#work-in-progress)    
 - **2.** [Initial Ideas](#initial-ideas)     
 - **3.** [Introduction](#introduction)     
 - **4.** [Biber Dimensions](#biber-dimensions-\--words-per-day)    
@@ -15,10 +15,11 @@ Need models that can predict TER on a sentence level and words per day on a docu
     + **4.2** [Classification](#classification-\--translation-difficulty)         
 - **5.** [Translation Edit Rate](#translation-edit-rate)
     + **5.1** [Connecting TER and Words per Day](#connecting-ter-and-words-per-day)    
-- **6.** [Text Data Pre-Training](#text-data-pre\-training)
-    + **6.1** [Sentence Embeddings with XLM](#sentence-embeddings-with-XLM)    
-- **7.** [Semi-Supervised Regression](#semi\-supervised-regression)
-  
+- **6.** [Timed Sentences](#timed-sentences)      
+- **7.** [Text Data Pre-Training](#text-data-pre\-training)
+    + **7.1** [Sentence Embeddings with XLM](#sentence-embeddings-with-XLM)    
+- **8.** [Semi-Supervised Regression](#semi\-supervised-regression)       
+
 ### Work in progress:
 
 - **1.** Correlation between Biber-dim and time taken to translate:    
@@ -36,17 +37,18 @@ Need models that can predict TER on a sentence level and words per day on a docu
     + classification [done]
 - **4.** Use TER score to predict time taken or classify text difficulty    
     + Build classifiers + cross-validation 
-- **5.** Use new timed dataset
+- **5.** Use new timed dataset [done]
 
 scores so far (just an indication of what should work or not):
 
 | Classification accuracy (3-class) | words per day | TER |
 |-----------------------------------|---------------|-----|
 | Biber dim                         |           48% | 40% |
-| XLM embeddings                    |           wip | 53% |
+| XLM embeddings                    |           wip | 54% |
 
 *Note: Words translated per day are only available for around 300 documents, score shown is accuracy obtained by a k-neighbours classifier (number of neighbours = 4). TER can be computed for any number of sentences, in this case results are shown for SVM on 200,000 sentences. For comparison, random classification yields a score around 33%, as expected. All results shown for French translations; Spanish offer similar results and in most cases marginally better scores. 
 
+See the [results](results/) folder for each experiment output.    
 Classifiers in experiments output f1-score, precision and recall for each label.   
 Regression models produce r2-score, MSE and QQ plots of residuals.
 
@@ -160,6 +162,12 @@ It is challenging to connect TER and words per day because the former is compute
 
 ![TER_WPS](img/ter_wps.png)      
 **Figure 7.** Correlation of TER of machine translated sentences versus words translated per second for human translation of the same sentences. This correlation hints to the existence of common factors in what makes translation difficult for MT and HT, however, both methods are quite different.  
+
+## Timed Sentences
+As both TER and XLM work on a sentence level, it is important to explore the difficulty to translate sentences. Figure 7 shows the correlation between the rate at which sentences were translated and the TER for the same sentences. Figure 8 displays the near-linear relationship between sentence length and time taken to translate, similar to that obtained on a document level in figure 1. 
+
+![Fr_Timed_Sentences_Time_words](img/french_time_words.png)      
+**Figure 8.** Time taken to translate a sentence against the number of words in the sentence. Linear relationship, as expected, but there is a large spread, especially for longer sentences. Original sentences in English translated to French.
 
 ## Text Data Pre-Training
 See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
