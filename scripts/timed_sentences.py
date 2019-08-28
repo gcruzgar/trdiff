@@ -18,9 +18,9 @@ if lan == "es":
     language = "Spanish"
 elif lan == "fr":
     language = "French"
-# Load time taken to translate and calculate sentence length
 
-wpd = pd.read_csv("data/golden-standard/en-"+lan+".pe", sep='\t').drop_duplicates()
+# Load time taken to translate and calculate sentence length
+wpd = pd.read_csv("data/golden-standard/en-"+lan+".processed", sep='\t').drop_duplicates()
 
 words=[]
 for i in wpd.index:
@@ -179,7 +179,7 @@ def xlm_classification():
     print(classification_report(y_test, y_pred, target_names=diff))
 
 #xlm_regression()
-xlm_classification()
+#xlm_classification()
 
 """ kde plots """
 pl = "rate"
