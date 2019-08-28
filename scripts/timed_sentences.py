@@ -3,6 +3,14 @@ import pandas as pd
 
 from scripts.utils import remove_outliers, linear_regression
 
+import seaborn as sns 
+import matplotlib.pyplot as plt
+
+from sklearn.svm import SVC
+from sklearn.metrics import mean_absolute_error 
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+
 import torch
 
 lan = "es"
@@ -61,20 +69,11 @@ qcor_df.columns=['q1', 'q2', 'q3', 'q4']
 print(qcor_df.round(3))
 
 # scatter plots
-import matplotlib.pyplot as plt
 plt.scatter(df['perms'], df['score'])
 plt.xlabel("words translated per ms")
 plt.ylabel("TER")
 plt.xlim([min(df['perms'])-0.0001, max(df['perms'])+0.0001])
 #plt.scatter(q3['perms'], q3['score'])
-plt.show()
-
-plt.figure()
-plt.scatter(dfr['words'], dfr['time (ms)'])
-plt.plot(np.unique(dfr['words']), np.poly1d(np.polyfit(dfr['words'], dfr['time (ms)'], 1))(np.unique(dfr['words'])), 'r--')
-plt.xlabel("Sentence length (words)")
-plt.ylabel("Time taken to translate (ms)")
-plt.title("Timed Sentences - %s" % language)
 plt.show()
 
 plt.figure()
@@ -85,13 +84,25 @@ plt.ylabel("TER")
 plt.title("Timed Sentences - %s" % language)
 plt.show()
 
+plt.figure()
+plt.scatter(dfr['words'], dfr['time (ms)'])
+plt.plot(np.unique(dfr['words']), np.poly1d(np.polyfit(dfr['words'], dfr['time (ms)'], 1))(np.unique(dfr['words'])), 'k--')
+plt.xlabel("Sentence length (words)")
+plt.ylabel("Time taken to translate (ms)")
+plt.title("Timed Sentences - %s" % language)
+#plt.show()
+
 # Line of best fit and distance from each point to the line
 c, m = np.polynomial.polynomial.polyfit(dfr['words'], dfr['time (ms)'], 1)
 y_pred = m*dfr['words'] + c 
 residuals = dfr['time (ms)'] - y_pred
 median_error = abs(residuals).median()
-pos_res = residuals.loc[residuals > median_error] # points below the line
-neg_res = residuals.loc[residuals < -median_error] # points above the line
+MAE = mean_absolute_error(dfr['time (ms)'], y_pred) # mean absolute error
+plt.plot(dfr['words'], y_pred+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
+plt.plot(dfr['words'], y_pred-MAE, 'r--')
+pos_res = residuals.loc[residuals >  MAE] # points above the line
+neg_res = residuals.loc[residuals < -MAE] # points below the line
+plt.show()
 
 # Load biber dimension and select useful dimensions
 biber = pd.read_csv("data/golden-standard/en-"+lan+"-biber.en", sep='\t')
@@ -142,9 +153,6 @@ def xlm_regression():
     ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df['perms'])
 
 def xlm_classification():
-    from sklearn.svm import SVC
-    from sklearn.metrics import classification_report
-    from sklearn.model_selection import train_test_split
     
     # Load sentece embeddings
     features = pd.DataFrame(torch.load("data/golden-standard/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
@@ -174,7 +182,6 @@ def xlm_classification():
 xlm_classification()
 
 """ kde plots """
-import seaborn as sns 
 pl = "rate"
 if pl=="rate":
     sns.distplot(dfr['perms']*100, hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.015})
