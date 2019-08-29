@@ -28,9 +28,17 @@ Summary statistics
 """ 
 Data pre-processing
 """
+# can either predict time ('days') or rate ('perday')
+target = 'perday' 
+if target == 'perday':
+    units = 'words per day'
+    min_lim, max_lim = 400, 2200 # best fit line limits
+else:
+    units = target
+    min_lim, max_lim = 0, 20
 
 # Join releveant data into one dataframe
-reg_df = pd.concat([reliable[['perday', 'words']], reliable1_dim], axis=1)
+reg_df = pd.concat([reliable[[target, 'words']], reliable1_dim], axis=1)
 
 # Convert categorical features into numerical labels
 use_cat = False
@@ -87,10 +95,10 @@ ols_residuals = y_test - y_pred
 ols.score(X_test_s, y_test)
 
 plt.scatter(y_test, y_pred)
-plt.plot(range(400,2200), range(400,2200), 'k-')
+plt.plot(range(min_lim,max_lim), range(min_lim,max_lim), 'k-')
 plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y_test)), 'r--')
-plt.xlabel('True values (words per day)')
-plt.ylabel('Predicted values (words per day)')
+plt.xlabel('True values (%s)' % units)
+plt.ylabel('Predicted values (%s)' % units)
 plt.title('Ordinary Least Squares')
 #plt.show()
 
@@ -109,10 +117,10 @@ rreg.score(X_test_s, y_test)
 
 plt.figure()
 plt.scatter(y_test, y_pred)
-plt.plot(range(400,2200), range(400,2200), 'k-')
+plt.plot(range(min_lim,max_lim), range(min_lim,max_lim), 'k-')
 plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y_test)), 'r--')
-plt.xlabel('True values (words per day)')
-plt.ylabel('Predicted values (words per day)')
+plt.xlabel('True values (%s)' % units)
+plt.ylabel('Predicted values (%s)' % units)
 plt.title("Ridge Regression")
 #plt.show()
 
@@ -130,10 +138,10 @@ lasso_residuals = y_test - y_pred
 
 plt.figure()
 plt.scatter(y_test, y_pred)
-plt.plot(range(400,2200), range(400,2200), 'k-')
+plt.plot(range(min_lim,max_lim), range(min_lim,max_lim), 'k-')
 plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y_test)), 'r--')
-plt.xlabel('True values (words per day)')
-plt.ylabel('Predicted values (words per day)')
+plt.xlabel('True values (%s)' % units)
+plt.ylabel('Predicted values (%s)' % units)
 plt.title("Lasso")
 #plt.show()
 
@@ -142,7 +150,7 @@ Scores
 """
 print("Ordinary Least Squares: %.3f" % ols.score(X_test_s, y_test))
 print("Ridge Regression: %.3f" % rreg.score(X_test_s, y_test))
-print("Ridge Regression: %.3f" % lasso.score(X_test_s, y_test))
+print("Lasso Regression: %.3f" % lasso.score(X_test_s, y_test))
 
 #Residuals
 plt.figure()
@@ -150,6 +158,27 @@ plt.plot(y_test, ols_residuals, '.')
 plt.xlabel("Real value")
 plt.ylabel("Residual")
 plt.title("OLS Residuals")
-plt.show()
+#plt.show()
 
-ols_residuals.describe()
+#ols_residuals.describe()
+
+"""
+Predict time taken
+"""
+if target == 'days':
+    lasso = linear_model.Lasso(alpha=1)
+    lasso.fit(X_train_s, y_train)
+
+    y_pred = lasso.predict(X_test_s)
+    lasso_residuals = y_test - y_pred
+
+    plt.figure()
+    r = plt.scatter(X_test['words'], y_test)
+    p = plt.scatter(X_test['words'], y_pred)
+    plt.plot(np.unique(X_test['words']), np.poly1d(np.polyfit(X_test['words'], y_pred, 1))(np.unique(X_test['words'])), 'r--')
+    plt.plot(np.unique(X_test['words']), np.poly1d(np.polyfit(X_test['words'], y_test, 1))(np.unique(X_test['words'])), 'k--')
+    plt.xlabel('Document length (words)')
+    plt.ylabel('Time taken to Translate (days)')
+    plt.legend((p, r), ('Predicted', 'Real'))
+
+plt.show()
