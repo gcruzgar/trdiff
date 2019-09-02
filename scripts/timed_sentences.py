@@ -20,7 +20,7 @@ elif lan == "fr":
     language = "French"
 
 # Load time taken to translate and calculate sentence length
-wpd = pd.read_csv("data/golden-standard/en-"+lan+".processed", sep='\t').drop_duplicates()
+wpd = pd.read_csv("data/un-timed-sentences/en-"+lan+".processed", sep='\t').drop_duplicates()
 
 words=[]
 for i in wpd.index:
@@ -33,7 +33,7 @@ time.columns= ["time (ms)", "words"]
 
 """ TER - words per day"""
 # Load TER scores
-ter = pd.read_csv("data/golden-standard/en-"+lan+"-gs.score", header=None, sep='\t')
+ter = pd.read_csv("data/un-timed-sentences/en-"+lan+"-gs.score", header=None, sep='\t')
 ter.columns = ["score"]
 
 # Join important columns to single dataframe
@@ -105,7 +105,7 @@ neg_res = residuals.loc[residuals < -MAE] # points below the line
 plt.show()
 
 # Load biber dimension and select useful dimensions
-biber = pd.read_csv("data/golden-standard/en-"+lan+"-biber.en", sep='\t')
+biber = pd.read_csv("data/un-timed-sentences/en-"+lan+"-biber.en", sep='\t')
 drop_cols = biber.columns[(biber == 0).sum() > 0.5*biber.shape[0]]
 biber.drop(drop_cols, axis=1, inplace=True)
 
@@ -143,27 +143,28 @@ elif lan=='es':
 
 plt.show()
 
-""" XLM - words per day """
-def xlm_regression():
+""" XLM - words per day / TER """
+def xlm_regression(var_name='perms'):
 
     # Load sentece embeddings
-    features = pd.DataFrame(torch.load("data/golden-standard/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
-    reg_df = df.merge(features, left_index=True, right_index=True)
+    features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+    reg_df = dfr.merge(features, left_index=True, right_index=True)
 
-    ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df['perms'])
+    print("Predicting %s..." % var_name)
+    ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df[var_name])
 
-def xlm_classification():
+def xlm_classification(var_name='perms'):
     
     # Load sentece embeddings
-    features = pd.DataFrame(torch.load("data/golden-standard/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+    features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
 
-    # Classify translation rate based on percentile
-    df["class"] = 1 # average rate
-    df.loc[df["rate"] >= df["rate"].quantile(0.67), "class"] = 0 # fast rate
-    df.loc[df["rate"] <= df["rate"].quantile(0.33), "class"] = 2 # slow rate
+    # Classify objective variable based on percentile
+    dfr["class"] = 1 # average
+    dfr.loc[df[var_name] >= dfr[var_name].quantile(0.67), "class"] = 0 # above average
+    dfr.loc[df[var_name] <= dfr[var_name].quantile(0.33), "class"] = 2 # below average
 
     # Split data into training and tests sets, set random_state for reproducibility
-    X_train, X_test, y_train, y_test = train_test_split(features, df["class"], test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(features.loc[dfr.index], dfr["class"], test_size=0.2, random_state=42)
 
     # Create classifier
     C=1
@@ -174,12 +175,12 @@ def xlm_classification():
 
     # Predict and evaluate results
     y_pred = clf.predict(X_test)
-    diff = {"fast rate": 0, "average rate": 1, "slow rate": 2}
-    print("\nclassification report:\n")
+    diff = {"above average": 0, "average": 1, "below average": 2}
+    print("\nClassification report (%s):\n" % var_name)
     print(classification_report(y_test, y_pred, target_names=diff))
 
-#xlm_regression()
-#xlm_classification()
+#xlm_regression(var_name='score')
+#xlm_classification(var_name='score')
 
 """ kde plots """
 pl = "rate"
