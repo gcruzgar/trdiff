@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 lan = "es"
 b_lan="en"
 # Load data
-timed = pd.read_csv("data/golden-standard/en-"+lan+".processed", sep='\t')
-biber = pd.read_csv("data/golden-standard/en-"+lan+"-biber."+b_lan, sep='\t')
+timed = pd.read_csv("data/un-timed-sentences/en-"+lan+".processed", sep='\t')
+biber = pd.read_csv("data/un-timed-sentences/en-"+lan+"-biber."+b_lan, sep='\t')
 
 # Calculated words translated per second
 words=[]
