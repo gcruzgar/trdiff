@@ -7,6 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 from sklearn.svm import SVC
+from sklearn.preprocessing import normalize
 from sklearn.metrics import mean_absolute_error 
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
@@ -143,20 +144,28 @@ elif lan=='es':
 
 plt.show()
 
-""" XLM - words per day / TER """
-def xlm_regression(var_name='perms'):
+""" XLM / BERT - words per day / TER """
+def embedding_regression(var_name='perms', model='xlm'):
 
     # Load sentece embeddings
-    features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+    if model == 'xlm' or model == 'XLM':
+        features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+    elif model == 'bert' or model == 'BERT':
+        features = pd.read_csv("data/un-timed-sentences/bert-embeddings-timed-sentences-"+lan+".csv")
+
     reg_df = dfr.merge(features, left_index=True, right_index=True)
 
-    print("Predicting %s..." % var_name)
+    print("Predicting %s using %s..." % (var_name, model))
     ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df[var_name])
 
-def xlm_classification(var_name='perms'):
-    
+def embedding_classification(var_name='perms', model='xlm'):
+
     # Load sentece embeddings
-    features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+    if model == 'xlm' or model == 'XLM':
+        features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+    elif model == 'bert' or model == 'BERT':
+        features = pd.read_csv("data/un-timed-sentences/bert-embeddings-timed-sentences-"+lan+".csv", header=None)
+        features = normalize(features, axis=0)
 
     # Classify objective variable based on percentile
     dfr["class"] = 1 # average
@@ -164,7 +173,8 @@ def xlm_classification(var_name='perms'):
     dfr.loc[df[var_name] <= dfr[var_name].quantile(0.33), "class"] = 2 # below average
 
     # Split data into training and tests sets, set random_state for reproducibility
-    X_train, X_test, y_train, y_test = train_test_split(features.loc[dfr.index], dfr["class"], test_size=0.2, random_state=42)
+
+    X_train, X_test, y_train, y_test = train_test_split(pd.DataFrame(features).loc[dfr.index], dfr["class"], test_size=0.2, random_state=42)
 
     # Create classifier
     C=1
@@ -176,11 +186,11 @@ def xlm_classification(var_name='perms'):
     # Predict and evaluate results
     y_pred = clf.predict(X_test)
     diff = {"above average": 0, "average": 1, "below average": 2}
-    print("\nClassification report (%s):\n" % var_name)
+    print("\nClassification report (%s - %s):\n" % (var_name, model))
     print(classification_report(y_test, y_pred, target_names=diff))
 
-#xlm_regression(var_name='score')
-#xlm_classification(var_name='score')
+#embedding_regression(var_name='score', model='bert')
+#embedding_classification(var_name='score', model='bert')
 
 """ kde plots """
 pl = "rate"

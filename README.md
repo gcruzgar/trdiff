@@ -162,7 +162,9 @@ As both TER and XLM work on a sentence level, it is important to explore the dif
 See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
 See [ELMo](https://github.com/allenai/allennlp/blob/master/tutorials/how_to/elmo.md) for PyTorch/TensorFlow implementation of Deep contextualized word representations.      
 See [BERT](https://github.com/google-research/bert) for a method of pre-training language representations in TensorFlow.     
-Also interesting to check out [huggingface](https://github.com/huggingface/pytorch-transformers)'s PyTorch-Transformers library of pre-trained models for NLP.
+
+Also interesting to check out [huggingface](https://github.com/huggingface/pytorch-transformers)'s PyTorch-Transformers library of pre-trained models for NLP.    
+A simple way to obtain sentence embeddings from BERT pre-trained models is to use [bert-as-service](https://github.com/hanxiao/bert-as-service).
 
 Dealing with unlabeled texts can be complex, however, by performing pre-training vectorisation of text data results can be significantly improved. The idea is to produce sentence embedding vectors which can be used for training. Once unlabelled text data is vectorised, it can be used to predict TER, translation rate etc. and ultimately text difficulty.
 
