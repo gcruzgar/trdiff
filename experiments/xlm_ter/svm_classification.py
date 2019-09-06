@@ -34,9 +34,21 @@ if rm_out == True:
     print("data points below 0.05 or above 0.95 quantiles removed")
 
 # Classify scores based on percentile
-df["class"] = 1 # average translation
-df.loc[df["score"] >= df["score"].quantile(0.67), "class"] = 0 # bad translation
-df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # good translation
+def classify_scores(df, num_classes=3):
+
+    if num_classes == 3:
+        df["class"] = 1 # average translation
+        df.loc[df["score"] >= df["score"].quantile(0.66), "class"] = 0 # bad translation
+        df.loc[df["score"] <= df["score"].quantile(0.33), "class"] = 2 # good translation
+        diff = {"bad translation": 0, "average translation": 1, "good translation": 2}
+    elif num_classes == 2:
+        df["class"] = 1 # good translation
+        df.loc[df["score"] >= df["score"].quantile(0.5), "class"] = 0 # bad translation
+        diff = {"bad translation": 0, "good translation": 1}
+
+    return df, diff
+
+df, diff = classify_scores(df, num_classes=3)
 
 # Split data into training and tests sets, set random_state for reproducibility
 X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["score", "class"]), df["class"], test_size=0.2, random_state=42)
@@ -61,6 +73,5 @@ clf.fit(X_train, y_train)
 
 # Predict and evaluate results
 y_pred = clf.predict(X_test)
-diff = {"bad translation": 0, "average translation": 1, "good translation": 2}
 print("\nclassification report:\n")
 print(classification_report(y_test, y_pred, target_names=diff))
