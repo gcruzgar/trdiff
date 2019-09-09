@@ -48,6 +48,8 @@ scores so far (just an indication of what should work or not):
 
 *Note: Words translated per day are only available for around 300 documents, score shown is accuracy obtained by a k-neighbours classifier (number of neighbours = 4). TER can be computed for any number of sentences, in this case results are shown for SVM on 200,000 sentences. For comparison, random classification yields a score around 33%, as expected. All results shown for French translations; Spanish offer similar results and in most cases marginally better scores. 
 
+Can also split data into 2 classes, good and bad translations (or easy and difficult) for which an accuracy of 70% is obtained on 200,000 sentences for the XLM-TER case.
+
 See the [results](results/) folder for each experiment output.    
 Classifiers in experiments output f1-score, precision and recall for each label.   
 Regression models produce r2-score, MSE and QQ plots of residuals.
