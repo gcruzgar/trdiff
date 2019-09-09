@@ -203,17 +203,18 @@ def time_length_plot(df=reliable):
 
     plt.plot(df['words'], df['days'], '.')
     plt.plot(df['words'],y_pred, 'k--')
-    plt.plot(df['words'], y_pred+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
-    plt.plot(df['words'], y_pred-MAE, 'r--')
+
+    x1 = np.linspace(min(df['words']), max(df['words']))
+    y1 = m*x1 + c
+
+    plt.plot(x1, y1+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
+    plt.plot(x1, y1-MAE, 'r--')
 
     #pos_res = residuals.loc[residuals >  MAE] # points above the line
     #neg_res = residuals.loc[residuals < -MAE] # points below the line
 
     plt.xlabel("Document length (words)")
     plt.ylabel("Time taken to translate (days)")
-
-    plt.rc('axes', titlesize=12)
-    plt.rc('axes', labelsize=10)
 
     plt.show()
 
