@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.svm import SVC
 from sklearn.preprocessing import normalize
+#from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error 
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
@@ -99,11 +100,17 @@ y_pred = m*dfr['words'] + c
 residuals = dfr['time (ms)'] - y_pred
 median_error = abs(residuals).median()
 MAE = mean_absolute_error(dfr['time (ms)'], y_pred) # mean absolute error
-plt.plot(dfr['words'], y_pred+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
-plt.plot(dfr['words'], y_pred-MAE, 'r--')
+
+x1 = np.linspace(min(dfr['words']), max(dfr['words']))
+y1 = m*x1 + c
+
+plt.plot(x1, y1+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
+plt.plot(x1, y1-MAE, 'r--')
+
+plt.show()
+
 pos_res = residuals.loc[residuals >  MAE] # points above the line
 neg_res = residuals.loc[residuals < -MAE] # points below the line
-plt.show()
 
 # Load biber dimension and select useful dimensions
 biber = pd.read_csv("data/un-timed-sentences/en-"+lan+"-biber.en", sep='\t')
@@ -151,7 +158,7 @@ def embedding_regression(var_name='perms', model='xlm'):
     if model == 'xlm' or model == 'XLM':
         features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
     elif model == 'bert' or model == 'BERT':
-        features = pd.read_csv("data/un-timed-sentences/bert-embeddings-timed-sentences-"+lan+".csv")
+        features = pd.read_csv("data/un-timed-sentences/bert-embeddings-timed-sentences-"+lan+"-multi.csv", header=None)
 
     reg_df = dfr.merge(features, left_index=True, right_index=True)
 
@@ -164,7 +171,9 @@ def embedding_classification(var_name='perms', model='xlm'):
     if model == 'xlm' or model == 'XLM':
         features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
     elif model == 'bert' or model == 'BERT':
-        features = pd.read_csv("data/un-timed-sentences/bert-embeddings-timed-sentences-"+lan+".csv", header=None)
+        features = pd.read_csv("data/un-timed-sentences/bert-embeddings-timed-sentences-"+lan+"-multi.csv", header=None)
+        #scaler = MinMaxScaler()
+        #features = scaler.fit_transform(features)
         features = normalize(features, axis=0)
 
     # Classify objective variable based on percentile
