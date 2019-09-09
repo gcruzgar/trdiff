@@ -3,10 +3,12 @@
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
+
 from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, r2_score 
 from sklearn import preprocessing
+from sklearn.metrics import mean_absolute_error 
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score 
 
 reliable = pd.read_csv("data/timed-un/reliable.dat", sep=' ')
 reliable1_dim = pd.read_csv("data/timed-un/reliable1-dim.dat", sep='\t')
@@ -182,3 +184,37 @@ if target == 'days':
     plt.legend((p, r), ('Predicted', 'Real'))
 
 plt.show()
+
+""" 
+Plot time taken vs document lenght with MAE lines
+"""
+def time_length_plot(df=reliable):
+
+    # Line of best fit and distance from each point to the line
+
+    plt.figure()
+
+    c, m = np.polynomial.polynomial.polyfit(df['words'], df['days'], 1)
+    y_pred = m*df['words'] + c 
+
+    residuals = df['days'] - y_pred
+    #median_error = abs(residuals).median()
+    MAE = mean_absolute_error(df['days'], y_pred) # mean absolute error
+
+    plt.plot(df['words'], df['days'], '.')
+    plt.plot(df['words'],y_pred, 'k--')
+    plt.plot(df['words'], y_pred+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
+    plt.plot(df['words'], y_pred-MAE, 'r--')
+
+    #pos_res = residuals.loc[residuals >  MAE] # points above the line
+    #neg_res = residuals.loc[residuals < -MAE] # points below the line
+
+    plt.xlabel("Document length (words)")
+    plt.ylabel("Time taken to translate (days)")
+
+    plt.rc('axes', titlesize=12)
+    plt.rc('axes', labelsize=10)
+
+    plt.show()
+
+time_length_plot(df=reliable)
