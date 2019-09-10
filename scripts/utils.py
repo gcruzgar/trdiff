@@ -8,10 +8,12 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
 
-from sklearn import linear_model
+from sklearn.svm import SVC
+from sklearn.linear_model import LinearRegression
+
 from sklearn import preprocessing
-from sklearn.metrics import accuracy_score, f1_score 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold
+from sklearn.metrics import accuracy_score, f1_score, r2_score 
 
 def linear_regression(X, y, test_size=0.2, random_state=123, plots=True):
 
@@ -22,7 +24,7 @@ def linear_regression(X, y, test_size=0.2, random_state=123, plots=True):
 
     X_test_s = scaler.transform(X_test)
 
-    ols = linear_model.LinearRegression()
+    ols = LinearRegression()
     ols.fit(X_train_s, y_train)
 
     y_pred = ols.predict(X_test_s)
@@ -130,3 +132,53 @@ def evaluate_classification(clf, X_test, y_test):
         print( "Accuracy for %s: %0.2f%%" % ( key, accuracy_score( key_val["y_test"], key_val["y_pred"] ) * 100 ) )
 
     return y_res
+
+def kfold_crossvalidation(X, y, k=5, method='reg', output='dic'):
+    """ 
+    Generate k-folds for provided X and y, fit and predict each fold and output joint dictionary or dataframe.
+    """
+
+    print("\nGenerating %d folds for %s...\n" % (k, method))
+
+    kf = KFold(n_splits=k)
+
+    i=0
+    y_dic = {}
+    for train_index, test_index in kf.split(X):
+
+        i+=1
+
+        X_train, X_test = X.iloc[train_index], X.iloc[test_index] 
+        y_train, y_test = y.iloc[train_index], y.iloc[test_index]
+
+        if method == 'clf':
+            model = SVC(gamma='auto', kernel='linear', C=10.0)
+        elif method == 'reg':
+            model = LinearRegression()
+
+        # Fit classifier to train data
+        model.fit(X_train, y_train)
+
+        # Predict using test data
+        y_pred = model.predict(X_test)
+
+        # save results
+        y_res = pd.DataFrame(y_pred, columns=['y_pred'], index=y_test.index)
+        y_res['y_test'] = y_test.values
+        y_dic[i] = y_res
+
+        if method == 'clf':
+            print("f1-score: %0.3f" % f1_score(y_test, y_pred, average='weighted'))
+        elif method == 'reg':
+            print("r2-score: %0.3f" % r2_score(y_test, y_pred))
+
+    if output == 'dic':
+        # output dictionary
+        y_out = y_dic
+    elif output == 'df':
+        # output dataframe
+        y_out = y_dic[1]
+        for i in range(2,k+1):
+            y_out = pd.concat([y_out, y_dic[i]])
+    
+    return y_out
