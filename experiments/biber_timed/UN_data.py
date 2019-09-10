@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
 
+from scripts.utils import kfold_crossvalidation, remove_outliers
+
 from sklearn import linear_model
 from sklearn import preprocessing
 from sklearn.metrics import mean_absolute_error 
@@ -41,6 +43,11 @@ else:
 
 # Join releveant data into one dataframe
 reg_df = pd.concat([reliable[[target, 'words']], reliable1_dim], axis=1)
+
+# Remove outliers
+rem_out = False
+if rem_out == True:
+    reg_df = remove_outliers(reg_df, target, lq=0.05, uq=0.95)
 
 # Convert categorical features into numerical labels
 use_cat = False
@@ -219,3 +226,29 @@ def time_length_plot(df=reliable):
     plt.show()
 
 time_length_plot(df=reliable)
+
+""" k-fold cross validation """
+kfold_y = kfold_crossvalidation(X, y, k=12, method='reg', output='df')
+
+plt.scatter(kfold_y['y_test'], kfold_y['y_pred'])
+plt.xlabel('True values (%s)' % units)
+plt.ylabel('Predicted values (%s)' % units)
+#plt.title('K-Fold Linear Regression')
+
+# y=x line and line of best fit
+#plt.plot(range( round(min(y)), round(max(y)) ), range( round(min(y)), round(max(y)) ), 'k-')
+plt.plot(np.unique(kfold_y['y_test']), np.poly1d(np.polyfit(kfold_y['y_test'], kfold_y['y_pred'], 1))(np.unique(kfold_y['y_test'])), 'k--')
+
+# Line of best fit and distance from each point to the line
+c, m = np.polynomial.polynomial.polyfit(kfold_y['y_test'], kfold_y['y_pred'], 1)
+y_line = m*kfold_y['y_test'] + c 
+
+MAE = mean_absolute_error(y, y_line) # mean absolute error
+
+x1 = np.linspace(min(kfold_y['y_test']), max(kfold_y['y_test']))
+y1 = m*x1 + c
+
+plt.plot(x1, y1+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
+plt.plot(x1, y1-MAE, 'r--')
+
+plt.show()
