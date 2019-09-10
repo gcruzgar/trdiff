@@ -13,7 +13,7 @@ from sklearn.linear_model import LinearRegression
 
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split, KFold
-from sklearn.metrics import accuracy_score, f1_score, r2_score 
+from sklearn.metrics import accuracy_score, f1_score, r2_score, median_absolute_error 
 
 def linear_regression(X, y, test_size=0.2, random_state=123, plots=True):
 
@@ -170,7 +170,7 @@ def kfold_crossvalidation(X, y, k=5, method='reg', output='dic'):
         if method == 'clf':
             print("f1-score: %0.3f" % f1_score(y_test, y_pred, average='weighted'))
         elif method == 'reg':
-            print("r2-score: %0.3f" % r2_score(y_test, y_pred))
+            print("r2-score: %0.3f, MAE: %0.2f" % ( r2_score(y_test, y_pred), median_absolute_error(y_test, y_pred)) )
 
     if output == 'dic':
         # output dictionary
