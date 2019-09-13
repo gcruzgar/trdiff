@@ -42,14 +42,15 @@ ter.columns = ["score"]
 df = pd.concat([ter, time], axis=1)
 
 # Calculate translation rate (and normalise)
-df['perms'] = df['words'] / df['time (ms)']
-df['rate'] = (df['perms'] - df['perms'].min()) / (df['perms'].max() - df['perms'].min())
+#df['perms'] = df['words'] / df['time (ms)'] # words per ms
+df['spw'] =  (df['time (ms)'])/1000 / df['words'] # seconds per word
+#df['rate'] = (df['perms'] - df['perms'].min()) / (df['perms'].max() - df['perms'].min())
 
 # Remove perfect translations
 dft = df.loc[df['score'] != 0]
 
 # Remove outliers
-dfr = remove_outliers(df, 'rate', lq=0.05, uq=0.95)
+dfr = remove_outliers(df, 'spw', lq=0.05, uq=0.95)
 
 # Correlation
 print(dfr.corr().round(3)['score'])
@@ -70,12 +71,29 @@ qcor_df.columns=['q1', 'q2', 'q3', 'q4']
 
 print(qcor_df.round(3))
 
+dfr = dfr.loc[dfr['spw'] < 8] # filter out extreme cases
+
 # scatter plots
-plt.scatter(df['perms'], df['score'])
-plt.xlabel("words translated per ms")
+plt.scatter(dfr['spw'], dfr['score'])
+plt.xlabel("seconds per word")
 plt.ylabel("TER")
-plt.xlim([min(df['perms'])-0.0001, max(df['perms'])+0.0001])
+#plt.xlim([min(df['spw'])-0.0001, max(df['spw'])+0.0001])
 #plt.scatter(q3['perms'], q3['score'])
+
+c, m = np.polynomial.polynomial.polyfit(dfr['spw'], dfr['score'], 1)
+y_pred = m*dfr['spw'] + c 
+residuals = dfr['score'] - y_pred
+median_error = abs(residuals).median()
+MAE = mean_absolute_error(dfr['score'], y_pred) # mean absolute error
+
+plt.plot(np.unique(dfr['spw']), np.poly1d(np.polyfit(dfr['spw'], dfr['score'], 1))(np.unique(dfr['spw'])), 'k--')
+
+x1 = np.linspace(min(dfr['spw']), max(dfr['spw']))
+y1 = m*x1 + c
+
+plt.plot(x1, y1+MAE, 'r--') # confidence intervals (bestfit +/- MAE)
+plt.plot(x1, y1-MAE, 'r--')
+
 plt.show()
 
 plt.figure()
@@ -152,7 +170,7 @@ elif lan=='es':
 plt.show()
 
 """ XLM / BERT - words per day / TER """
-def embedding_regression(var_name='perms', model='xlm'):
+def embedding_regression(var_name='spw', model='xlm'):
 
     # Load sentece embeddings
     if model == 'xlm' or model == 'XLM':
@@ -163,9 +181,9 @@ def embedding_regression(var_name='perms', model='xlm'):
     reg_df = dfr.merge(features, left_index=True, right_index=True)
 
     print("Predicting %s using %s..." % (var_name, model))
-    ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "perms", "rate"]), reg_df[var_name])
+    ols, scaler, X_test, y_test = linear_regression(reg_df.drop(columns=["score", "time (ms)", "words", "spw"]), reg_df[var_name])
 
-def embedding_classification(var_name='perms', model='xlm'):
+def embedding_classification(var_name='spw', model='xlm'):
 
     # Load sentece embeddings
     if model == 'xlm' or model == 'XLM':
@@ -201,11 +219,39 @@ def embedding_classification(var_name='perms', model='xlm'):
 #embedding_regression(var_name='score', model='bert')
 #embedding_classification(var_name='score', model='bert')
 
+from sklearn.linear_model import Ridge
+def ridge_regression(var_name='spw', model='xlm'):
+    
+    # Load sentece embeddings
+    if model == 'xlm' or model == 'XLM':
+        features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+    elif model == 'bert' or model == 'BERT':
+        features = pd.read_csv("data/un-timed-sentences/bert-embeddings-timed-sentences-"+lan+".csv", header=None)
+
+    X_train, X_test, y_train, y_test = train_test_split(pd.DataFrame(features).loc[dfr.index], dfr[var_name], test_size=0.2)
+
+    rreg = Ridge(alpha=10)
+    rreg.fit(X_train, y_train)
+    y_pred = rreg.predict(X_test)
+    
+    # Real vs Predicted
+    plt.figure()
+    plt.scatter(y_test, y_pred)
+    #plt.plot(range(0, 1), range(0, 1), 'k-')
+    plt.plot(np.unique(y_test), np.poly1d(np.polyfit(y_test, y_pred, 1))(np.unique(y_test)), 'r--')
+    plt.xlabel('True values')
+    plt.ylabel('Predicted values')
+    plt.title('OLS - Real vs Predicted')
+    plt.show()
+    print("r2-score: %.3f" % rreg.score(X_test, y_test))
+
+#ridge_regression(var_name='score', model='bert')
+
 """ kde plots """
-pl = "rate"
-if pl=="rate":
-    sns.distplot(dfr['perms']*100, hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.015})
-    plt.xlabel("Translation Rate (words per second)")
+pl = "spw"
+if pl=="spw":
+    sns.distplot(dfr['spw']*100, hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 50})
+    plt.xlabel("Time spen translating (seconds per word)")
 elif pl=="ter":
     sns.distplot(dfr['score'], hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.05})
     plt.xlabel("TER")
@@ -217,3 +263,79 @@ plt.ylabel("Density")
 plt.title("Timed Sentence Translation - %s" % language)
 
 plt.show()
+
+""" predicting sentences """
+from sklearn.svm import SVR 
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.linear_model import LinearRegression
+
+from sklearn.svm import SVC
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.neural_network import MLPClassifier
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_absolute_error, classification_report
+
+features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+spw = dfr['spw']
+
+#X_test = torch.load("data/xlm-predict_sentences.pt").data.numpy()
+
+reg_df = features.merge(spw, left_index=True, right_index=True)
+
+def sentence_regression(reg_df, method='lr'):
+
+    if method == 'lr':
+        model = LinearRegression()
+    elif method == 'svr':
+        model = SVR(kernel='linear', C=1.0)
+    if method == 'abr':
+        model = AdaBoostRegressor(n_estimators=50)
+
+    X = reg_df.drop(columns=['spw'])
+    y = reg_df['spw']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+
+    model.fit(X_train, y_train)
+    print(model.score(X_test, y_test))
+
+    y_pred = model.predict(X_test)
+    print(mean_absolute_error(y_test, y_pred))
+
+sentence_regression(reg_df, method='lr')
+
+# Classify objective variable based on percentile
+reg_df["class"] = 1 # average
+reg_df.loc[reg_df['spw'] >= reg_df['spw'].quantile(0.67), "class"] = 0 # above average
+reg_df.loc[reg_df['spw'] <= reg_df['spw'].quantile(0.33), "class"] = 2 # below average
+
+def sentence_classification(method='svc'): 
+
+    if method == 'svc':
+        model = SVC(gamma='auto', kernel='linear', C=10.0)
+    elif method == 'abc':
+        model = AdaBoostClassifier(algorithm='SAMME.R', n_estimators=50)
+    elif method == 'mlp':
+        model = MLPClassifier(activation="relu", solver="adam", alpha=0.1, random_state=42)
+
+    X = reg_df.drop(columns=['spw', "class"])
+    y = reg_df['class']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
+
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+
+    diff = {"long time": 0, "average time": 1, "short time": 2}
+    print(classification_report(y_test, y_pred, target_names=diff))
+
+""" cross-validation """
+from scripts.utils import kfold_crossvalidation
+X = reg_df.drop(columns=['spw'])
+y = reg_df['spw']
+y_df = kfold_crossvalidation(X, y, k=10, method='reg', output='df')
+
+#print(classification_report(y_df['y_test'], y_df['y_pred'], target_names=diff))
+print(model.score(X_test, y_test))
+print(mean_absolute_error(y_df['y_test'], y_df['y_pred']))
