@@ -337,5 +337,5 @@ y = reg_df['spw']
 y_df = kfold_crossvalidation(X, y, k=10, method='reg', output='df')
 
 #print(classification_report(y_df['y_test'], y_df['y_pred'], target_names=diff))
-print(model.score(X_test, y_test))
-print(mean_absolute_error(y_df['y_test'], y_df['y_pred']))
+print("Correlation = %0.3f" % y_df.corr().iloc[0,1])
+print("MAE = %0.3f" %mean_absolute_error(y_df['y_test'], y_df['y_pred']))
