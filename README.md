@@ -28,18 +28,18 @@ Need models that can predict TER on a sentence level and words per day on a docu
         * classification [done]    
     + WTO-timed [done]    
 - **2.** Correlation between Biber-dim and TER score:    
-    + UN-parallel (at sentence and document level)
-        * regression [sentence done]
-        * classification [sentece wip]
-    + cross-validation    
+    + UN-parallel (at sentence level)
+        * regression [done]
+        * classification [done]
+    + cross-validation [done]    
 - **3.** Use XLM to vectorise texts and correlate with TER score 
     + regression [done]
     + classification [done]
 - **4.** Use TER score to predict time taken or classify text difficulty [done]   
-    + Build classifiers + cross-validation 
+    + Build classifiers + cross-validation [done]
 - **5.** Use new timed dataset [done]
 
-scores so far (just an indication of what should work or not):
+Top scores so far (just an indication of what should work or not):
 
 | Classification accuracy (3-class) | words per day | TER |
 |-----------------------------------|---------------|-----|
@@ -120,6 +120,9 @@ WTO data has the advantage of including translation times to both French and Spa
 
 It is interesting to note that if outliers are not removed from the combined dataset, the regression becomes quite accurate in the range 0-2500 words per day, however, it also produces significant outliers that throw the entire model off. Could be interesting to only use the model in this range and figure out what produces said outliers (several orders of magnitude wrong).
 
+![UN_OLS](img/biber_wpd_kfold_ols.png)    
+**Figure 6.** Predicted against real values of words translated per day for the UNOG dataset (using biber dimensions and number of words in each document). Cross-validated results with 12 equal splits of data.
+
 Note: before extracting Biber dimensions, it is important to make sure there is one text per line and that there are no empty lines as this will cause _biber-dim.py_ to fail. Each corpus may have it's particular solutions. For example:
 
 ```bash
@@ -141,7 +144,7 @@ Computing the TER on a machine translation gives a score based on the minimum nu
 Note that in order to compute TER, both a machine translation and a human reference are required. See the [pre-processing](scripts/prepare_ter_docs.py) needed to compute TER for the UN corpus as an example. 
 
 ![UN_ES_Histogram](img/un_ter_hist.png)      
-**Figure 6.** Distribution of translation edit rate for machine translated sentences with human reference for UN documents after removal of top and bottom 5% of TER scores. Original documents in English translated to Spanish (left) and French (right).
+**Figure 7.** Distribution of translation edit rate for machine translated sentences with human reference for UN documents after removal of top and bottom 5% of TER scores. Original documents in English translated to Spanish (left) and French (right).
 
 It could be interesting to relate TER score with the Biber dimensions of the original text, to determine if any of these factors makes machine translation harder. 
 Preliminary results show no correlation between TER and biber dimensions on a sentence level - OLS and SVR on large UN corpus. There is inherent difficulty in this as Biber dimensions are designed to work on a document level whilst TER works best on a sentence level. 
@@ -149,16 +152,16 @@ Preliminary results show no correlation between TER and biber dimensions on a se
 ### Connecting TER and words per day
 TER and words translated per day are both measures of how difficult a text is to translate. However, TER is a measure of the difficulty for machine translation whilst words per day plays a similar role for human translation. We can assume these two are connected to a certain extent such that if a factor causes machine translation to be harder, it is likely to also contribute to a slower human translation. 
 
-It is challenging to connect TER and words per day because the former is computed on a sentence basis whilst the latter tends to be quoted per document. Another problem is that, whilst TER can be computed on any text with a human reference, there is a lack of open access information on time taken to translate. Having information on the time taken to translate for a small amount of sentences (around 200 sentences), the correlation between TER and time taken was found to be 0.228, whilst that between TER and rate of translation was -0.343 (see figure 7.). This is just an indication of the correlation as the data available is limited, however, it shows that machine translation and human translation are connected, albeit far from a one-to-one link.    
+It is challenging to connect TER and words per day because the former is computed on a sentence basis whilst the latter tends to be quoted per document. Another problem is that, whilst TER can be computed on any text with a human reference, there is a lack of open access information on time taken to translate. Having information on the time taken to translate for a small amount of sentences (around 200 sentences), the correlation between TER and time taken was found to be 0.228, whilst that between TER and rate of translation was -0.343 (see figure 8.). This is just an indication of the correlation as the data available is limited, however, it shows that machine translation and human translation are connected, albeit far from a one-to-one link.    
 
-![TER_WPS](img/ter_wps.png)      
-**Figure 7.** Correlation of TER of machine translated sentences versus words translated per second for human translation of the same sentences. This correlation hints to the existence of common factors in what makes translation difficult for MT and HT, however, both methods are quite different.  
+![TER_WPS](img/french_ter_wpd.png)      
+**Figure 8.** Correlation of TER of machine translated sentences versus words translated per mili-second for human translation of the same sentences. This correlation hints to the existence of common factors in what makes translation difficult for MT and HT, however, both methods are quite different.  
 
 ## Timed Sentences
-As both TER and XLM work on a sentence level, it is important to explore the difficulty to translate sentences. Figure 7 shows the correlation between the rate at which sentences were translated and the TER for the same sentences. Figure 8 displays the near-linear relationship between sentence length and time taken to translate, similar to that obtained on a document level in figure 1. 
+As both TER and XLM work on a sentence level, it is important to explore the difficulty to translate sentences. Figure 8 shows the correlation between the rate at which sentences were translated and the TER for the same sentences. Figure 9 displays the near-linear relationship between sentence length and time taken to translate, similar to that obtained on a document level in figure 1. 
 
 ![Fr_Timed_Sentences_Time_words](img/french_time_words.png)      
-**Figure 8.** Time taken to translate a sentence against the number of words in the sentence. Linear relationship, as expected, but there is a large spread, especially for longer sentences. Original sentences in English translated to French.
+**Figure 9.** Time taken to translate a sentence against the number of words in the sentence. Linear relationship, as expected, but there is a large spread, especially for longer sentences. Original sentences in English translated to French.
 
 ## Text Data Pre-Training
 See [XLM](https://github.com/facebookresearch/XLM) for PyTorch original implementation of Cross-lingual Language Model Pretraining.     
