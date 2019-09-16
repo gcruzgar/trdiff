@@ -19,6 +19,7 @@ features = load_embeddings(xlm_path)
 
 # Join data into single dataframe
 df = ter.merge(features, left_on=ter.index, right_on=features.index)
+df = df.drop(columns=['key_0'])
 
 # Remove outliers
 rm_out=True
