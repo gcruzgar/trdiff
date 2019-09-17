@@ -20,9 +20,16 @@ if lan == "es":
     language = "Spanish"
 elif lan == "fr":
     language = "French"
+elif lan == "all":
+    language = "French & Spanish"
 
 # Load time taken to translate and calculate sentence length
-wpd = pd.read_csv("data/un-timed-sentences/en-"+lan+".processed", sep='\t').drop_duplicates()
+if lan == "all":
+    es = pd.read_csv("data/un-timed-sentences/en-es.processed", sep='\t')
+    fr = pd.read_csv("data/un-timed-sentences/en-fr.processed", sep='\t')
+    wpd = pd.concat([es,fr], axis=0, ignore_index=True).drop_duplicates()
+else:
+    wpd = pd.read_csv("data/un-timed-sentences/en-"+lan+".processed", sep='\t').drop_duplicates()
 
 words=[]
 for i in wpd.index:
@@ -35,7 +42,12 @@ time.columns= ["time (ms)", "words"]
 
 """ TER - words per day"""
 # Load TER scores
-ter = pd.read_csv("data/un-timed-sentences/en-"+lan+"-gs.score", header=None, sep='\t')
+if lan == "all":
+    es = pd.read_csv("data/un-timed-sentences/en-es-gs.score", header=None, sep='\t')
+    fr = pd.read_csv("data/un-timed-sentences/en-fr-gs.score", header=None, sep='\t')
+    ter = pd.concat([es,fr], axis=0, ignore_index=True)
+else:
+    ter = pd.read_csv("data/un-timed-sentences/en-"+lan+"-gs.score", header=None, sep='\t')
 ter.columns = ["score"]
 
 # Join important columns to single dataframe
@@ -56,22 +68,27 @@ dfr = remove_outliers(df, 'spw', lq=0.05, uq=0.95)
 print(dfr.corr().round(3)['score'])
 
 # Quantiles
-q1 = df.loc[df['perms'] <= df['perms'].quantile(0.25)]
-q2 = df.loc[(df['perms'] >= df['perms'].quantile(0.25)) & (df['perms'] <= df['perms'].quantile(0.50))]
-q3 = df.loc[(df['perms'] >= df['perms'].quantile(0.50)) & (df['perms'] <= df['perms'].quantile(0.75))]
-q4 = df.loc[df['perms'] >= df['perms'].quantile(0.75)]
+def quantiles(df):
+    """ Output distribution of each quantile in the data set. """
 
-q_corr={}
-q_df={1:q1, 2:q2, 3:q3, 4:q4}
-for q in range(1,5):
-    q_corr[q] = q_df[q].corr()['score']
+    q1 = df.loc[df['perms'] <= df['perms'].quantile(0.25)]
+    q2 = df.loc[(df['perms'] >= df['perms'].quantile(0.25)) & (df['perms'] <= df['perms'].quantile(0.50))]
+    q3 = df.loc[(df['perms'] >= df['perms'].quantile(0.50)) & (df['perms'] <= df['perms'].quantile(0.75))]
+    q4 = df.loc[df['perms'] >= df['perms'].quantile(0.75)]
 
-qcor_df = pd.DataFrame.from_dict(q_corr)
-qcor_df.columns=['q1', 'q2', 'q3', 'q4']
+    q_corr={}
+    q_df={1:q1, 2:q2, 3:q3, 4:q4}
+    for q in range(1,5):
+        q_corr[q] = q_df[q].corr()['score']
 
-print(qcor_df.round(3))
+    qcor_df = pd.DataFrame.from_dict(q_corr)
+    qcor_df.columns=['q1', 'q2', 'q3', 'q4']
 
-dfr = dfr.loc[dfr['spw'] < 8] # filter out extreme cases
+    print(qcor_df.round(3))
+
+#dfr = dfr.loc[dfr['spw'] < 8] # filter out extreme cases
+dfr = dfr.loc[dfr['score'] <= 1.0] 
+dfr = dfr.loc[dfr['words'] <= 90]
 
 # scatter plots
 plt.scatter(dfr['spw'], dfr['score'])
@@ -131,8 +148,13 @@ pos_res = residuals.loc[residuals >  MAE] # points above the line
 neg_res = residuals.loc[residuals < -MAE] # points below the line
 
 # Load biber dimension and select useful dimensions
-biber = pd.read_csv("data/un-timed-sentences/en-"+lan+"-biber.en", sep='\t')
-drop_cols = biber.columns[(biber == 0).sum() > 0.5*biber.shape[0]]
+if lan == "all":
+    es = pd.read_csv("data/un-timed-sentences/en-es-biber.en", sep='\t')
+    fr = pd.read_csv("data/un-timed-sentences/en-fr-biber.en", sep='\t')
+    biber = pd.concat([es,fr], axis=0, ignore_index=True)
+else:
+    biber = pd.read_csv("data/un-timed-sentences/en-"+lan+"-biber.en", sep='\t')
+drop_cols = biber.columns[(biber == 0).sum() > 0.75*biber.shape[0]]
 biber.drop(drop_cols, axis=1, inplace=True)
 
 pos_res_df = biber.loc[pos_res.index]
@@ -250,13 +272,13 @@ def ridge_regression(var_name='spw', model='xlm'):
 """ kde plots """
 pl = "spw"
 if pl=="spw":
-    sns.distplot(dfr['spw']*100, hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 50})
-    plt.xlabel("Time spen translating (seconds per word)")
+    sns.distplot(dfr['spw']*100, hist=True, kde=True, bins=20, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 50})
+    plt.xlabel("Time spent translating (seconds per word)")
 elif pl=="ter":
-    sns.distplot(dfr['score'], hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.05})
+    sns.distplot(dfr['score'], hist=True, kde=True, bins=20, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 0.05})
     plt.xlabel("TER")
 elif pl=="words":
-    sns.distplot(dfr['words'], hist=True, kde=True, bins=15, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 5})
+    sns.distplot(dfr['words'], hist=True, kde=True, bins=20, hist_kws={'edgecolor': 'black'}, kde_kws={'bw': 5})
     plt.xlabel("Sentence Length (number of words)")
 
 plt.ylabel("Density")
@@ -276,7 +298,13 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, classification_report
 
-features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+if lan == "all":
+    es = pd.DataFrame(torch.load("data/un-timed-sentences/en-es-gs-xlm-embeddings.pt").data.numpy())
+    fr = pd.DataFrame(torch.load("data/un-timed-sentences/en-fr-gs-xlm-embeddings.pt").data.numpy())
+    features = pd.concat([es,fr], axis=0, ignore_index=True)
+else:
+    features = pd.DataFrame(torch.load("data/un-timed-sentences/en-"+lan+"-gs-xlm-embeddings.pt").data.numpy())
+
 spw = dfr['spw']
 
 #X_test = torch.load("data/xlm-predict_sentences.pt").data.numpy()
@@ -332,10 +360,14 @@ def sentence_classification(method='svc'):
 
 """ cross-validation """
 from scripts.utils import kfold_crossvalidation
-X = reg_df.drop(columns=['spw'])
-y = reg_df['spw']
+X = reg_df.drop(columns=['spw']) # , 'class' if classification
+y = reg_df['spw'] # 'class' if classification
 y_df = kfold_crossvalidation(X, y, k=10, method='reg', output='df')
 
+#method = 'clf'
+#diff = {"slow translation": 0, "average translation": 1, "fast translation": 2}
 #print(classification_report(y_df['y_test'], y_df['y_pred'], target_names=diff))
+
+#method = 'reg'
 print("Correlation = %0.3f" % y_df.corr().iloc[0,1])
 print("MAE = %0.3f" %mean_absolute_error(y_df['y_test'], y_df['y_pred']))
