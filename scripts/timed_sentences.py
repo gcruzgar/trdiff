@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 
 import torch
 
-lan = "es"
+lan = "all"
 if lan == "es":
     language = "Spanish"
 elif lan == "fr":
@@ -360,7 +360,7 @@ def sentence_classification(method='svc'):
 
 """ cross-validation """
 from scripts.utils import kfold_crossvalidation
-X = reg_df.drop(columns=['spw']) # , 'class' if classification
+X = reg_df.drop(columns=['spw','class'])
 y = reg_df['spw'] # 'class' if classification
 y_df = kfold_crossvalidation(X, y, k=10, method='reg', output='df')
 
