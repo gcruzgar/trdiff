@@ -1,45 +1,43 @@
-# trdiff
+# Translation Difficulty Estimation
 
-The overall objective is to understand what makes a text difficult to translate.  
-Can we predict which text are easier/harder to translate? (for human translation or machine translation)       
-Can we modify or improve existing methods?      
-Improve NLP methods by making alterations to input texts or by selecting how and when new examples are taught to the algorithm.      
-Need models that can predict TER on a sentence level and words per day on a document level. Both in either regression or classification tasks.
+With increasing globalisation and the push towards automation, it becomes essential to improve the current translation workflows. In this project, the United Nations corpus is explored in order to understand the factors contributing to difficulties in both human and machine translation. The time taken for human translation of documents is predicted, as well as classification of sentences based on their predicted machine translation usefulness. This is achieved using a combination of lexical features, translation edit rate and sentence vectorisation through Facebook's XLM neural networks.
+
+See the [case study](docs/trdiff-case_study.pdf) for a one-page summary of the work conducted in this project. 
 
 ## Table of contents
-- **1.** [Work in Progress](#work-in-progress)    
-- **2.** [Initial Ideas](#initial-ideas)     
-- **3.** [Introduction](#introduction)     
-- **4.** [Biber Dimensions](#biber-dimensions-\--words-per-day)    
-    + **4.1** [Regression](#regression-\--translation-rate)  
-    + **4.2** [Classification](#classification-\--translation-difficulty)         
-- **5.** [Translation Edit Rate](#translation-edit-rate)
-    + **5.1** [Connecting TER and Words per Day](#connecting-ter-and-words-per-day)    
-- **6.** [Timed Sentences](#timed-sentences)      
-- **7.** [Text Data Pre-Training](#text-data-pre\-training)
-    + **7.1** [Sentence Embeddings with XLM](#sentence-embeddings-with-XLM)    
-- **8.** [Semi-Supervised Regression](#semi\-supervised-regression)       
+- **1.** [Initial Ideas](#initial-ideas)     
+- **2.** [Introduction](#introduction)     
+- **3.** [Biber Dimensions](#biber-dimensions-\--words-per-day)    
+    + **3.1** [Regression](#regression-\--translation-rate)  
+    + **3.2** [Classification](#classification-\--translation-difficulty)         
+- **4.** [Translation Edit Rate](#translation-edit-rate)
+    + **4.1** [Connecting TER and Words per Day](#connecting-ter-and-words-per-day)    
+- **5.** [Timed Sentences](#timed-sentences)      
+- **6.** [Text Data Pre-Training](#text-data-pre\-training)
+    + **6.1** [Sentence Embeddings with XLM](#sentence-embeddings-with-XLM)    
+- **7.** [Semi-Supervised Regression](#semi\-supervised-regression)       
 
-### Work in progress:
+### Initial Ideas:
 
-- **1.** Correlation between Biber-dim and time taken to translate:    
-    + UN-timed [done]
-        * regression [done]
-        * classification [done]    
-    + WTO-timed [done]    
-- **2.** Correlation between Biber-dim and TER score:    
-    + UN-parallel (at sentence level)
-        * regression [done]
-        * classification [done]
-    + cross-validation [done]    
-- **3.** Use XLM to vectorise texts and correlate with TER score 
-    + regression [done]
-    + classification [done]
-- **4.** Use TER score to predict time taken or classify text difficulty [done]   
-    + Build classifiers + cross-validation [done]
-- **5.** Use new timed dataset [done]
+- Linear regression using Biber dimensions (predicting words per day):
+  + UN texts  
+  + WTO texts 
+- Prediction of MT errors and it's relation to text difficulty - domain adaptation
+  + Predict TER using Biber dimensions
+  + Predict TER using XLM pretraining
+  + Build models and test on timed UN data to predict words per day
+- Test QEBrain - MT errors without reference
+- Semi-supervised approaches and NN: 
+  + Curriculum learning - X. Zuang et al. 2018, "An Empirical Exploration of Curriculum Learning for Neural Machine Translation" 
+  + denoising MT - W. Wang et al. 2018, "Denoising Neural Machine Translation Training with Trusted Data and Online Data Selection"
+  + Bidirectional Language Model (biLM) - M. E. Peters et al 2018, "Deep contextualized word representations" 
+  + Y. Yang et al 2019, "Improving Multilingual Sentence Embedding using Bi-directional Dual Encoder with Additive Margin Softmax"
+  + K. Fan et al 2018, "Bilingial Expert Can Find Translation Errors"
+  + D. Yogotama et al 2019, "Learning and Evaluating General Linguistic Intelligence"
+  + G. Kostopoulos et al 2018, "Semi-Supervised Regression: A recent review"
+- Visualisation of multidimensional data
 
-Top scores so far (just an indication of what should work or not):
+Top scores for 3-class predictions:
 
 | Classification accuracy (3-class) | words per day | TER |
 |-----------------------------------|---------------|-----|
@@ -53,26 +51,6 @@ Can also split data into 2 classes, good and bad translations (or easy and diffi
 See the [results](results/) folder for each experiment output.    
 Classifiers in experiments output f1-score, precision and recall for each label.   
 Regression models produce r2-score, MSE and QQ plots of residuals.
-
-### Initial Ideas:
-
-- Linear regression using Biber dimensions (predicting words per day):
-  + UN texts  
-  + WTO texts 
-- Prediction of MT errors and it's relation to text difficulty - domain adaptation
-  + Predict TER using Biber dimensions
-  + Predict TER using XLM pretraining
-  + Build models and test on timed UN data to predict words per day
-- Test QEBrain - MT errors without reference
-- Semi-supervised approaches and NN: [Relatively new field - can learn basic NN and try some of these]
-  + Curriculum learning - X. Zuang et al. 2018, "An Empirical Exploration of Curriculum Learning for Neural Machine Translation" 
-  + denoising MT - W. Wang et al. 2018, "Denoising Neural Machine Translation Training with Trusted Data and Online Data Selection"
-  + Bidirectional Language Model (biLM) - M. E. Peters et al 2018, "Deep contextualized word representations" 
-  + Y. Yang et al 2019, "Improving Multilingual Sentence Embedding using Bi-directional Dual Encoder with Additive Margin Softmax"
-  + K. Fan et al 2018, "Bilingial Expert Can Find Translation Errors"
-  + D. Yogotama et al 2019, "Learning and Evaluating General Linguistic Intelligence"
-  + G. Kostopoulos et al 2018, "Semi-Supervised Regression: A recent review"
-- Visualisation of multidimensional data [Basic knowledge of this - would be interesting to see what we can do]   
 
 ## Introduction
 As one would expect, the time it takes to translate a document is roughly proportional to the number of words it contains (see figure 1). Nonetheless, there is great variance between documents. If time taken was only dependent on the length of a document, the rate of translation (words per day) would be a constant. In the case of the tested UN corpus this would be approximately 1429 words per day. However, as we can see in figure 2, there is a large distribution of translation rates across the documents (standard deviation of 484 words per day). Therefore, there must be other variables causing such differences. 
