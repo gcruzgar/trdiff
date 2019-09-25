@@ -4,6 +4,7 @@ import os
 import re
 
 import torch
+import random
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt 
@@ -182,3 +183,18 @@ def kfold_crossvalidation(X, y, k=5, method='reg', output='dic'):
             y_out = pd.concat([y_out, y_dic[i]])
     
     return y_out
+
+def split_sentences(sentence_list, train_size=0.6):
+    """ Shuffle sentences and split into train, test and validation sets """
+
+    num_sentences = len(sentence_list)
+
+    random.shuffle(sentence_list)
+
+    data_dic = {
+        "train": sentence_list[0:round(train_size*num_sentences)],
+        "test": sentence_list[round(train_size*num_sentences):round(((1 + train_size) / 2) *num_sentences)],
+        "validate": sentence_list[round(((1 + train_size) / 2)*num_sentences):]
+    }
+
+    return data_dic
